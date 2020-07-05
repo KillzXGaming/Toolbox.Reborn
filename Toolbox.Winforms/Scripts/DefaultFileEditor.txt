@@ -1,0 +1,16 @@
+﻿##TextEditor##
+.txt
+.h
+.c
+.cs
+.cpp
+.fruit
+.juice
+.mshader
+.mshaders
+.mshadergraph
+.glsl
+.frag
+.vert
+.geom
+.compute

@@ -1,0 +1,408 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7C3C488A-AC77-4D2B-841E-76699E3D412C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>STLibraryForms</RootNamespace>
+    <AssemblyName>STLibraryForms</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GL_EditorFramework">
+      <HintPath>..\External\GL_EditorFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="ObjectListView">
+      <HintPath>..\External\ObjectListView.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK">
+      <HintPath>..\External\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK.GLControl">
+      <HintPath>..\External\OpenTK.GLControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Toolbox.Core">
+      <HintPath>..\External\Toolbox.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Forms\Dialog\ColorSelector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Dialog\HSVPixel.cs" />
+    <Compile Include="Forms\Dialog\STColorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Dialog\STColorControl.Designer.cs">
+      <DependentUpon>STColorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Dialog\STColorDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Dialog\STColorDialog.Designer.cs">
+      <DependentUpon>STColorDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\OpenGL2D\GLShaderGeneric.cs" />
+    <Compile Include="Forms\OpenGL2D\IPickableObject.cs" />
+    <Compile Include="Forms\OpenGL2D\OpenGL2DEnums.cs" />
+    <Compile Include="Forms\OpenGL2D\OpenGLHelper.cs" />
+    <Compile Include="Forms\OpenGL2D\Render2D.cs" />
+    <Compile Include="Forms\OpenGL2D\ShaderManager.cs" />
+    <Compile Include="Forms\OpenGL2D\STRectangle.cs" />
+    <Compile Include="Forms\OpenGL2D\Viewport2D.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Animation\KeyedAnimTimeline.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Animation\STAnimationPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Animation\STAnimationPanel.Designer.cs">
+      <DependentUpon>STAnimationPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Animation\TimeLine.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Animation\TimeLine.Designer.cs" />
+    <Compile Include="Forms\Controls\BarSlider\BarSlider.cs" />
+    <Compile Include="Forms\Controls\BarSlider\BarSlider.Designer.cs" />
+    <Compile Include="Forms\Controls\ColorSlider.cs" />
+    <Compile Include="Forms\Controls\ColorSlider.Designer.cs" />
+    <Compile Include="Forms\Controls\DropdownPanel\ExpandCollapseEventArgs.cs" />
+    <Compile Include="Forms\Controls\DropdownPanel\STCollapsePanelButton.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\DropdownPanel\STCollapsePanelButton.Designer.cs" />
+    <Compile Include="Forms\Controls\DropdownPanel\STDropDownPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\DropdownPanel\STDropDownPanel.Designer.cs" />
+    <Compile Include="Forms\Controls\DropdownPanel\STFlowLayoutPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\EditorInterface.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\FlatTabControl\FlatTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\FlatTabControl\Win32.cs" />
+    <Compile Include="Forms\Controls\ListViewCustom.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\MenuStrip\STToolStipMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\MinMaxButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\NumericUpDownFloat.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\NumericUpDownInt.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\NumericUpDownUint.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\PictureBoxCustom.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STButtonToggle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STCheckBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\MenuStrip\STContextMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STDataGridView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STNumbericUpDown.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STNumericBox.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STNumericBox.Designer.cs" />
+    <Compile Include="Forms\Controls\STPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STProgressBar.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STProgressBar.Designer.cs">
+      <DependentUpon>STProgressBar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Controls\STPropertyGrid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STPropertyGrid.Designer.cs" />
+    <Compile Include="Forms\Controls\STRadioButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STTrackBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\STUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\Controls\TreeView\TreeViewExtensions.cs" />
+    <Compile Include="Forms\Dialog\ExportModelSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Dialog\ExportModelSettings.Designer.cs">
+      <DependentUpon>ExportModelSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Dialog\FolderSelectDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Forms\Dialog\RenameDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Dialog\RenameDialog.Designer.cs">
+      <DependentUpon>RenameDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\MapEditor\DrawableBackground.cs" />
+    <Compile Include="Forms\MapEditor\DrawableFloor.cs" />
+    <Compile Include="Forms\MapEditor\DrawableSkybox.cs" />
+    <Compile Include="Forms\MapEditor\DrawableXyzLines.cs" />
+    <Compile Include="Forms\MapEditor\MapEditor3D.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\MapEditor\ObjectHiearchy.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Forms\MapEditor\ObjectHiearchy.Designer.cs">
+      <DependentUpon>ObjectHiearchy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TreeView\TreeNodeCustom.cs" />
+    <Compile Include="Forms\UV\PickableUVMap.cs" />
+    <Compile Include="Forms\UV\UVViewport.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FormThemes.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Rendering\ColorConeRenderer.cs" />
+    <Compile Include="Rendering\ColorPlaneRenderer.cs" />
+    <Compile Include="Rendering\ColorSphereRenderer.cs" />
+    <Compile Include="Rendering\GenericPickableMesh.cs" />
+    <Compile Include="Rendering\GenericRenderer.cs" />
+    <Compile Include="Rendering\LineRenderer.cs" />
+    <Compile Include="Rendering\ModelRender\GenericSkeletonRender.cs" />
+    <Compile Include="Rendering\ModelRender\GenericModelRender.cs" />
+    <Compile Include="Rendering\ObjAnimController.cs" />
+    <Compile Include="Rendering\OpenTKHelper.cs" />
+    <Compile Include="Rendering\RenderablePath\PathUndo.cs" />
+    <Compile Include="Rendering\RenderablePath\RenderableConnectedPath.cs" />
+    <Compile Include="Rendering\RenderablePath\RenderablePathPoint.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\Animation\TimeLine.resx" />
+    <EmbeddedResource Include="Forms\Controls\BarSlider\BarSlider.resx" />
+    <EmbeddedResource Include="Forms\Controls\ColorSlider.resx" />
+    <EmbeddedResource Include="Forms\Controls\DropdownPanel\STCollapsePanelButton.resx" />
+    <EmbeddedResource Include="Forms\Controls\DropdownPanel\STDropDownPanel.resx" />
+    <EmbeddedResource Include="Forms\Controls\FlatTabControl\FlatTabControl.resx" />
+    <EmbeddedResource Include="Forms\Controls\ListViewCustom.resx" />
+    <EmbeddedResource Include="Forms\Controls\STCheckBox.resx" />
+    <EmbeddedResource Include="Forms\Controls\STComboBox.resx" />
+    <EmbeddedResource Include="Forms\Controls\STDataGridView.resx" />
+    <EmbeddedResource Include="Forms\Controls\STForm.resx" />
+    <EmbeddedResource Include="Forms\Controls\STNumbericUpDown.resx" />
+    <EmbeddedResource Include="Forms\Controls\STNumericBox.resx" />
+    <EmbeddedResource Include="Forms\Controls\STPropertyGrid.resx" />
+    <EmbeddedResource Include="Forms\Controls\STTabControl.resx" />
+    <EmbeddedResource Include="Forms\Controls\STTextBox.resx" />
+    <EmbeddedResource Include="Forms\Controls\STUserControl.resx" />
+    <EmbeddedResource Include="Forms\Dialog\ColorSelector.resx">
+      <DependentUpon>ColorSelector.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Dialog\ExportModelSettings.resx">
+      <DependentUpon>ExportModelSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Dialog\RenameDialog.resx">
+      <DependentUpon>RenameDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MapEditor\ObjectHiearchy.resx">
+      <DependentUpon>ObjectHiearchy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\PauseBtn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\PlayArrowR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\ResetArrowR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\RewindArrows1L.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\RewindArrows1R.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\RewindArrows2L.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\RewindArrows2R.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Playback\StopBtn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CheckBox\CheckClicked.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CheckBox\CheckMark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CheckBox\Hovered.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CheckBox\Init_false.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationGroup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrack.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackA.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackB.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackR.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackW.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackX.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackY.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AnimationTimeline\AnimationTrackZ.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NumbericUpDownArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CheckerBackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MissingTexture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Texture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TextureError.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Menubar\maximize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Menubar\maximize_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Menubar\maximized.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Menubar\minimize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Menubar\minimize_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Menubar\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Menubar\close_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\arrowMinimize .png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Forms\OpenGL2D\Camera\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
