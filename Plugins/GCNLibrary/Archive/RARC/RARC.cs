@@ -11,7 +11,7 @@ namespace CTRLibrary
         public bool CanSave { get; set; } = true;
 
         public string[] Description { get; set; } = new string[] { "RARC" };
-        public string[] Extension { get; set; } = new string[] { "*.rarc", "*.arc", "*.yaz0" };
+        public string[] Extension { get; set; } = new string[] { "*.rarc", "*.arc", "*.szp", "*.yaz0" };
 
         public File_Info FileInfo { get; set; }
 

@@ -436,6 +436,20 @@ namespace Toolbox.Winforms
             {
                 var fileInfo = (ArchiveFileInfo)obj.Tag;
 
+                if (fileInfo.OpenFileFormatOnLoad)
+                {
+                    fileInfo.FileFormat = fileInfo.OpenFile();
+                }
+                if (fileInfo.FileFormat != null)
+                {
+                    var fileNode = ObjectListWrapperLoader.OpenFormat(imgList, fileInfo.FileFormat);
+                    obj.Tag = fileInfo.FileFormat;
+                    foreach (var child in fileNode.Children)
+                        obj.AddChild(child);
+                    SelectionChanged(obj);
+                    return;
+                }
+
                 ArchiveFilePanel hexEditor = GetActiveEditor<ArchiveFilePanel>();
                 hexEditor.LoadFile(this, fileInfo);
             }

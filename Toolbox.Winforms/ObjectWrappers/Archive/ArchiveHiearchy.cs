@@ -34,17 +34,6 @@ namespace Toolbox.Winforms
         {
             if (node.Tag is ArchiveFileInfo) {
                 ArchiveFileInfo = (ArchiveFileInfo)node.Tag;
-                if (ArchiveFileInfo.OpenFileFormatOnLoad) {
-                    ArchiveFileInfo.FileFormat = ArchiveFileInfo.OpenFile();
-                }
-                if (ArchiveFileInfo.FileFormat != null)
-                {
-                    expanded = true;
-                    var fileNode = ObjectListWrapperLoader.OpenFormat(ObjectView.ImageList, ArchiveFileInfo.FileFormat);
-                    node.Tag = ArchiveFileInfo.FileFormat;
-                    foreach (var child in fileNode.Children)
-                        AddChild(child);
-                }
             }
 
             ArchiveFile = archiveFile;

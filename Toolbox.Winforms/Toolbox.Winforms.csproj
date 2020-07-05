@@ -268,7 +268,7 @@
     <Compile Include="ObjectWrappers\TextureContainerWrapper.cs" />
     <Compile Include="ObjectWrappers\TextureWrapper.cs" />
     <Compile Include="ObjectWrappers\FileWrapper.cs" />
-    <Compile Include="ObjectWrappers\ObjectViewWrapperHandler.cs" />
+    <Compile Include="ObjectWrappers\ObjectviewWrapperHandler.cs" />
     <Compile Include="OpenDialogCustom.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
