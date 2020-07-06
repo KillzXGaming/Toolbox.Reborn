@@ -306,7 +306,9 @@ namespace Toolbox.Core.Collada
             {
                 foreach (var insance_controller in daeNode.instance_controller)
                 {
-                    var skeletonNode = insance_controller.skeleton[0];
+                    string skeletonNode = "";
+                    if (insance_controller.skeleton != null)
+                        skeletonNode = insance_controller.skeleton[0];
 
                     NodeInstanceTransform.Add(model.Meshes.Count, skeletonNode);
 
@@ -430,8 +432,6 @@ namespace Toolbox.Core.Collada
 
                 mesh.Vertices[v].Position = Vector3.TransformPosition(mesh.Vertices[v].Position, node.Transform);
                 mesh.Vertices[v].Normal = Vector3.TransformNormal(mesh.Vertices[v].Normal, node.Transform);
-
-                Console.WriteLine($"TRANSFORM {v} {mesh.Vertices[v].Position} {node.Transform.ExtractScale()}");
             }
 
             if (controller != null)
@@ -795,6 +795,7 @@ namespace Toolbox.Core.Collada
             mat.M21 = float.Parse(data[4]); mat.M22 = float.Parse(data[5]); mat.M23 = float.Parse(data[6]); mat.M24 = float.Parse(data[7]);
             mat.M31 = float.Parse(data[8]); mat.M32 = float.Parse(data[9]); mat.M33 = float.Parse(data[10]); mat.M34 = float.Parse(data[11]);
             mat.M41 = float.Parse(data[12]); mat.M42 = float.Parse(data[13]); mat.M43 = float.Parse(data[14]); mat.M44 = float.Parse(data[15]);
+            mat.Transpose();
             return mat;
         }
 
