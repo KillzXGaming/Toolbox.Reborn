@@ -63,18 +63,10 @@ namespace Toolbox.Core.Collada
                 return Matrix4.Identity;
 
             var mat = new Matrix4(
-               (float)values[0], (float)values[1], (float)values[2], (float)values[3],
-               (float)values[4], (float)values[5], (float)values[6], (float)values[7],
-               (float)values[8], (float)values[9], (float)values[10], (float)values[11],
-               (float)values[12], (float)values[13], (float)values[14], (float)values[15]);
-
-            mat.Transpose();
-
-        /*    var mat = new Matrix4(
                 (float)values[0], (float)values[4], (float)values[8], (float)values[12],
                 (float)values[1], (float)values[5], (float)values[9], (float)values[13],
                 (float)values[2], (float)values[6], (float)values[10], (float)values[14],
-                (float)values[3], (float)values[7], (float)values[11], (float)values[15]);*/
+                (float)values[3], (float)values[7], (float)values[11], (float)values[15]);
 
             return mat;
         }

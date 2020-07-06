@@ -69,6 +69,21 @@ namespace Toolbox.Core.Collada
                         if (group.MaterialIndex < model.Materials.Count && group.MaterialIndex != -1)
                             group.Material = model.Materials[group.MaterialIndex];
                     }
+
+                    if (colladaScene.UpAxisType == UpAxisType.Z_UP)
+                    {
+                        for (int v = 0; v < mesh.Vertices.Count; v++)
+                        {
+                            mesh.Vertices[v].Position = new Vector3(
+                                mesh.Vertices[v].Position.X,
+                                mesh.Vertices[v].Position.Z,
+                               -mesh.Vertices[v].Position.Y);
+                            mesh.Vertices[v].Normal = new Vector3(
+                                mesh.Vertices[v].Normal.X,
+                                mesh.Vertices[v].Normal.Z,
+                               -mesh.Vertices[v].Normal.Y);
+                        }
+                    }
                 }
 
                 if (settings.FixDuplicateNames)
@@ -147,7 +162,7 @@ namespace Toolbox.Core.Collada
 
         static List<STGenericTexture> LoadTextures(string folder, ColladaScene scene)
         {
-            if (scene.images == null) return new List<STGenericTexture>();
+            if (scene.images == null || scene.images.image == null) return new List<STGenericTexture>();
 
             List<STGenericTexture> textures = new List<STGenericTexture>();
             foreach (var image in scene.images.image)
@@ -245,11 +260,10 @@ namespace Toolbox.Core.Collada
                 node.Children.Add(LoadHiearchy(node, child, model, colladaScene));
 
             //Transform all meshes by node transform
-            foreach (var child in node.Children)
-                TransformMeshInstanced(model, child);
+        //TODO //   foreach (var child in node.Children)
+              //  TransformMeshInstanced(model, child);
 
             NodeInstanceTransform.Clear();
-
             return node;
         }
 
@@ -405,16 +419,19 @@ namespace Toolbox.Core.Collada
                 }
             }
 
-            foreach (var vertex in mesh.Vertices)
+            for (int v = 0; v < mesh.Vertices.Count; v++)
             {
                 if (scene.Settings.FlipUVsVertical)
                 {
-                    for (int i = 0; i < vertex.TexCoords.Length; i++)
-                        vertex.TexCoords[i] = new Vector2(vertex.TexCoords[i].X, 1 - vertex.TexCoords[i].Y);
+                    for (int i = 0; i < mesh.Vertices[v].TexCoords.Length; i++)
+                        mesh.Vertices[v].TexCoords[i] = new Vector2(mesh.Vertices[v].TexCoords[i].X, 1 - mesh.Vertices[v].TexCoords[i].Y);
                 }
 
-                 vertex.Position = Vector3.TransformPosition(vertex.Position, node.Transform);
-                 vertex.Normal = Vector3.TransformNormal(vertex.Normal, node.Transform);
+
+                mesh.Vertices[v].Position = Vector3.TransformPosition(mesh.Vertices[v].Position, node.Transform);
+                mesh.Vertices[v].Normal = Vector3.TransformNormal(mesh.Vertices[v].Normal, node.Transform);
+
+                Console.WriteLine($"TRANSFORM {v} {mesh.Vertices[v].Position} {node.Transform.ExtractScale()}");
             }
 
             if (controller != null)
@@ -622,24 +639,12 @@ namespace Toolbox.Core.Collada
                         (float)array.Values[index + 1],
                         (float)array.Values[index + 2]);
                     vertex.Position = ApplyUintScaling(scene, vertex.Position);
-                    if (scene.UpAxisType == UpAxisType.Z_UP) {
-                        vertex.Position = new Vector3(
-                             vertex.Position.X,
-                             vertex.Position.Z,
-                             -vertex.Position.Y);
-                    }
                     break;
                 case "NORMAL":
                     vertex.Normal = new Vector3(
                         (float)array.Values[index + 0],
                         (float)array.Values[index + 1],
                         (float)array.Values[index + 2]);
-                    if (scene.UpAxisType == UpAxisType.Z_UP) {
-                        vertex.Normal = new Vector3(
-                             vertex.Normal.X,
-                             vertex.Normal.Z,
-                             -vertex.Normal.Y);
-                    }
                     break;
                 case "TEXCOORD":
                     vertex.TexCoords[set] = new Vector2(
@@ -780,9 +785,10 @@ namespace Toolbox.Core.Collada
             if (text == null || text == "")
                 return OpenTK.Matrix4.Identity;
 
-            var mat = OpenTK.Matrix4.Identity;
-            string[] data = text.Trim().Replace("\n", " ").Split(' ');
-            if (data.Length != 48)
+            Matrix4 mat = Matrix4.CreateScale(1, 1, 1);
+        string[] data = text.Trim().Replace("\n", " ").Split(' ');
+            Console.WriteLine($"CreateBindMatrix data {data.Length}");
+            if (data.Length != 16)
                 return mat;
 
             mat.M11 = float.Parse(data[0]); mat.M12 = float.Parse(data[1]); mat.M13 = float.Parse(data[2]); mat.M14 = float.Parse(data[3]);
