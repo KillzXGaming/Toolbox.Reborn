@@ -641,6 +641,9 @@ namespace Toolbox.Core.WiiU
 
         public static byte[] Decode(GX2Surface tex, int ArrayIndex = -1, int MipIndex = -1, string DebugTextureName = "")
         {
+            if (tex.data.Length == 0)
+                return new byte[0];
+
             uint blkWidth, blkHeight;
             if (IsFormatBCN((GX2SurfaceFormat)tex.format))
             {

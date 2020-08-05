@@ -11,8 +11,7 @@ using System.Linq;
 namespace GCNLibrary.WW
 {
     //Note:
-    //These games will bake skeleton data into animations. 
-    //Models have no bone sets.
+    //Rather than having bone sets for models, the game will bake skeleton data into animations. 
 
     /// <summary>
     /// Reperesents an animation that animates a skeleton.

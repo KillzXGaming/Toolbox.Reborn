@@ -74,6 +74,9 @@ namespace Toolbox.Core
 
             { "R32G8X24",  new FormatInfo(8, 1,  1, 1, TargetBuffer.Color) },
             { "RGBG8",     new FormatInfo(4, 1,  1, 1, TargetBuffer.Color) },
+            { "RGB565",    new FormatInfo(2,  1, 1, 1, TargetBuffer.Color) },
+            { "RGB5A3",    new FormatInfo(16, 1, 1, 1, TargetBuffer.Color) },
+
             { "BGRX8",     new FormatInfo(4, 1,  1, 1, TargetBuffer.Color) },
             { "BGR5A1",    new FormatInfo(2, 1,  1, 1, TargetBuffer.Color) },
             { "RGB5A1",    new FormatInfo(2, 1,  1, 1, TargetBuffer.Color) },
@@ -99,7 +102,7 @@ namespace Toolbox.Core
             { "ASTC_5x5",              new FormatInfo(16, 5,  5, 1,  TargetBuffer.Color) },
             { "ASTC_6x5",              new FormatInfo(16, 6,  5, 1, TargetBuffer.Color) },
             { "ASTC_6x6",              new FormatInfo(16, 6,  6, 1,  TargetBuffer.Color) },
-            { "ASTC_8x5",              new FormatInfo(16, 8,  5,  1, TargetBuffer.Color) },
+            { "ASTC_8x5",              new FormatInfo(16, 8,  5, 1, TargetBuffer.Color) },
             { "ASTC_8x6",              new FormatInfo(16, 8,  6, 1, TargetBuffer.Color) },
             { "ASTC_8x8",              new FormatInfo(16, 8,  8, 1,  TargetBuffer.Color) },
             { "ASTC_10x5",             new FormatInfo(16, 10, 5, 1, TargetBuffer.Color) },
@@ -128,8 +131,6 @@ namespace Toolbox.Core
             { "I8",                    new FormatInfo(8,  8, 4, 1, TargetBuffer.Color) },
             { "IA4",                   new FormatInfo(8,  8, 4, 1, TargetBuffer.Color) },
             { "IA8",                   new FormatInfo(16, 4, 4, 1, TargetBuffer.Color) },
-            { "RGB565",                new FormatInfo(2, 4, 4, 1, TargetBuffer.Color) },
-            { "RGB5A3",                new FormatInfo(16, 4, 4, 1, TargetBuffer.Color) },
             { "C4",                    new FormatInfo(4,  8, 8, 1, TargetBuffer.Color) },
             { "C8",                    new FormatInfo(8,  8, 4, 1, TargetBuffer.Color) },
             { "C14X2",                 new FormatInfo(16, 4, 4, 1, TargetBuffer.Color) },

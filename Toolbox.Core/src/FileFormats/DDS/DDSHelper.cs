@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using Toolbox.Core.IO;
 
 namespace Toolbox.Core
@@ -9,8 +9,10 @@ namespace Toolbox.Core
     {
         public static List<STGenericTexture.Surface> GetArrayFaces(DDS dds, uint Length, int DepthLevel = 0)
         {
-            using (FileReader reader = new FileReader(dds.ImageData))
-            {
+            int Dx10Size = dds.IsDX10 ? 20 : 0;
+            using (FileReader reader = new FileReader(dds.FileInfo.FilePath)) {
+                reader.TemporarySeek((int)(4 + dds.MainHeader.Size + Dx10Size), SeekOrigin.Begin);
+
                 var format = dds.Platform.OutputFormat;
 
                 var Surfaces = new List<STGenericTexture.Surface>();

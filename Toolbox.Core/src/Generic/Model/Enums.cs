@@ -42,6 +42,8 @@ namespace Toolbox.Core
         Normal,
         Emission,
         Specular,
+        Shadow,
+        Ambient,
     }
 
     /// <summary>

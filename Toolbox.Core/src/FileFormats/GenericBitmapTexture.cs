@@ -5,6 +5,7 @@ using Toolbox.Core.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Toolbox.Core.Imaging;
+using System.IO;
 
 namespace Toolbox.Core
 {
@@ -57,6 +58,7 @@ namespace Toolbox.Core
         }
 
         public GenericBitmapTexture(string filePath) {
+            Name = Path.GetFileName(filePath);
             LoadBitmap(new Bitmap(filePath), true);
         }
 

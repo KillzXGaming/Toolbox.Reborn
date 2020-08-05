@@ -243,6 +243,17 @@ namespace Toolbox.Core
             }
         }
 
+        public void Replace(string filePath)
+        {
+            foreach (var format in FileManager.GetImportableTextures())
+            {
+                if (format.IdentifyImport(Utils.GetExtension(filePath))) {
+                    format.Import(filePath);
+                    break;
+                }
+            }
+        }
+
         public void SaveBitmap(string filePath, TextureExportSettings settings = null)
         {
             var bitmap = GetBitmap(settings.ArrayLevel, settings.MipLevel);
@@ -258,7 +269,7 @@ namespace Toolbox.Core
             uint width = Math.Max(1, Width >> MipLevel);
             uint height = Math.Max(1, Height >> MipLevel);
             byte[] data = GetImageData(ArrayLevel, MipLevel, DepthLevel);
-            return Platform.DecodeImage(this, data, width, height, ArrayLevel, MipLevel);
+            return data;
         }
 
         /// <summary>
@@ -284,6 +295,12 @@ namespace Toolbox.Core
             {
                 LoadOpenGLTexture();
                 return RenderableTex.ToBitmap();
+            }
+
+            if (IsBCNCompressed())
+            {
+                width = ((width + 3) / 4) * 4;
+                height = ((height + 3) / 4) * 4;
             }
 
             return BitmapExtension.CreateBitmap(data, (int)width, (int)height);

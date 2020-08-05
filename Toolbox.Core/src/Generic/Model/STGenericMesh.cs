@@ -71,6 +71,17 @@ namespace Toolbox.Core
 
         #region methods
 
+        public static List<T> SeperatePolygonGroups<T>(STGenericMesh mesh) 
+            where T : STGenericMesh, new()
+        {
+            List<T> meshes = new List<T>(mesh.PolygonGroups.Count);
+            for (int i = 0; i < mesh.PolygonGroups.Count; i++) {
+                meshes.Add(mesh.PolygonGroups[i].SeperatePolygonGroup<T>(mesh, i));
+            }
+
+            return meshes;
+        }
+
         /// <summary>
         /// Gets a list of materials used by all the polygon groups.
         /// </summary>
@@ -107,35 +118,37 @@ namespace Toolbox.Core
             Vertices.AddRange(verticesNew.Keys);
         }
 
-        public void OptimizeVertices(STPolygonGroup group)
+        public void OptimizeVertices()
         {
             Dictionary<VertexStruct, uint> vertexBank = new Dictionary<VertexStruct, uint>();
             List<STVertex> vertices = new List<STVertex>();
-            List<uint> faces = new List<uint>();
 
-            Console.WriteLine($"Vertices {Vertices.Count}");
-            foreach (var ind in group.Faces)
+            foreach (var group in PolygonGroups)
             {
-                var v = Vertices[(int)ind];
+                List<uint> faces = new List<uint>();
+                foreach (var ind in group.Faces)
+                {
+                    if (ind >= Vertices.Count)
+                        continue;
 
-                VertexStruct vert = v.ToStruct();
-                if (!vertexBank.ContainsKey(vert))
-                {
-                    uint index = (uint)vertexBank.Count;
-                    faces.Add(index);
-                    vertexBank.Add(vert, index);
-                    vertices.Add(v);
+                    var v = Vertices[(int)ind];
+
+                    VertexStruct vert = v.ToStruct();
+                    if (!vertexBank.ContainsKey(vert))
+                    {
+                        uint index = (uint)vertexBank.Count;
+                        faces.Add(index);
+                        vertexBank.Add(vert, index);
+                        vertices.Add(v);
+                    }
+                    else
+                    {
+                        faces.Add(vertexBank[vert]);
+                    }
                 }
-                else
-                {
-                    faces.Add(vertexBank[vert]);
-                }
+                group.Faces = faces.ToList();
             }
-
-            Console.WriteLine($"newvertices {vertices.Count}");
-
             Vertices = vertices.ToList();
-            group.Faces = faces.ToList();
         }
 
         struct Vertex
@@ -145,54 +158,8 @@ namespace Toolbox.Core
             public Vector2 TexCoord { get; set; }
         }
 
-        public void RemoveDuplicateVertices()
-        {
-            int MAX_BANK = 30000; //  for speeding this up a little with some loss...
-
-            foreach (STPolygonGroup p in PolygonGroups)
-            {
-                List<STVertex> newVertices = new List<STVertex>();
-                List<uint> newFaces = new List<uint>();
-
-                List<STVertex> vbank = new List<STVertex>(); // only check last 50 verts - may miss far apart ones but is faster
-                foreach (int f in p.Faces)
-                {
-                    int newFaceIndex = -1;
-                    int i = 0;
-
-                    // Has to loop through all the new vertices each time, which is very slow.
-                    foreach (STVertex v in vbank)
-                    {
-                        if (v.Equals(Vertices[f]))
-                        {
-                            newFaceIndex = i;
-                            break;
-                        }
-                        else
-                            i++;
-                    }
-
-                    bool verticesAreEqual = newFaceIndex != -1;
-                    if (verticesAreEqual)
-                    {
-                        newFaces.Add((uint)(newVertices.Count + newFaceIndex));
-                    }
-                    else
-                    {
-                        vbank.Add(Vertices[f]);
-                        newFaces.Add((uint)(newVertices.Count + vbank.Count - 1));
-                    }
-                    if (vbank.Count > MAX_BANK)
-                    {
-                        newVertices.AddRange(vbank);
-                        vbank.Clear();
-                    }
-                }
-                newVertices.AddRange(vbank);
-
-                Vertices = newVertices;
-                p.Faces = newFaces;
-            }
+        public void RemoveDuplicateVertices() {
+            OptimizeVertices();
         }
 
         /// <summary>

@@ -43,8 +43,6 @@ namespace GCNLibrary.LM.MDL
             Unknown3 = reader.ReadByte();
             Padding = reader.ReadBytes(23); //padding
             TevStages = new TevStage[8];
-
-            Console.WriteLine($"NumTevStages {NumTevStages} Unknown1 {Unknown1} AlphaFlags {AlphaFlags} Unknown3 {Unknown3}");
             for (int i = 0; i < 8; i++)
                 TevStages[i] = new TevStage(reader);
         }

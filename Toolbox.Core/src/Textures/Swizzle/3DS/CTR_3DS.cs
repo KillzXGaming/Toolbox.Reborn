@@ -99,7 +99,12 @@ namespace Toolbox.Core
             if (settings == null) settings = new SwizzleSettings();
 
             if (picaFormat == PICASurfaceFormat.ETC1 || picaFormat == PICASurfaceFormat.ETC1A4)
-                return FlipVertical(Width, Height, ETC1.ETC1Decompress(Input, Width, Height, picaFormat == PICASurfaceFormat.ETC1A4));
+            {
+                if (settings.Orientation == Orientation.Transpose)
+                    return ETC1.ETC1Decompress(Input, Width, Height, picaFormat == PICASurfaceFormat.ETC1A4);
+                else
+                    return FlipVertical(Width, Height, ETC1.ETC1Decompress(Input, Width, Height, picaFormat == PICASurfaceFormat.ETC1A4));
+            }
 
             byte[] Output = new byte[Width * Height * 4];
 
@@ -122,11 +127,6 @@ namespace Toolbox.Core
                         int OOffet = ((TY + Y) * stride + TX + X) * 4;
                         if (OOffet + 4 >= Output.Length)
                             break;
-
-                        if (settings.Orientation == Orientation.Rotate90)
-                        {
-
-                        }
 
                         DecodeFormat(Output, Input, OOffet, IOffset, picaFormat);
                         IOffset += Increment;
@@ -183,7 +183,11 @@ namespace Toolbox.Core
                 }
             }
 
-            return FlipVertical(Width, Height, Output);
+
+            if (settings.Orientation == Orientation.Transpose)
+                return Output;
+            else
+                return FlipVertical(Width, Height, Output);
         }
 
         private static void DecodeFormat(byte[] Output, byte[] Input, int OOffet, int IOffset, PICASurfaceFormat picaFormat)

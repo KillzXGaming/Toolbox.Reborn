@@ -53,6 +53,16 @@ namespace Toolbox.Core.ModelView
             ImageKey = "Folder";
         }
 
+        public virtual void OnClick()
+        {
+
+        }
+
+        public virtual void OnDoubleClick()
+        {
+
+        }
+
         public virtual void OnBeforeExpand()
         {
         }
@@ -60,6 +70,15 @@ namespace Toolbox.Core.ModelView
         public virtual void OnAfterCollapse()
         {
 
+        }
+
+        public string LoadFileDialog(string name = "")
+        {
+            GUI.SaveFileDialog sfd = new GUI.SaveFileDialog();
+            if (sfd.ShowDialog() == GUI.SaveFileDialog.Result.OK) {
+                return sfd.FileName;
+            }
+            return "";
         }
 
         public virtual ToolMenuItem[] GetContextMenuItems()

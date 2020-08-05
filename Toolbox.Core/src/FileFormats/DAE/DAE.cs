@@ -379,8 +379,7 @@ namespace Toolbox.Core.Collada
                     bool HasUV2 = false;
                     bool HasBoneIds = false;
 
-                    foreach (var group in mesh.PolygonGroups)
-                        mesh.OptimizeVertices(group);
+                    mesh.OptimizeVertices();
 
                     foreach (var vertex in mesh.Vertices)
                     {

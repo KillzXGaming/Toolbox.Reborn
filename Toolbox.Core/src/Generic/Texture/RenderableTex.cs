@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL;
 using System.Runtime.InteropServices;
 using Toolbox.Core.Imaging;
+using System.Drawing.Text;
 
 namespace Toolbox.Core
 {
@@ -125,36 +126,9 @@ namespace Toolbox.Core
 
             width = (int)GenericTexture.Width;
             height = (int)GenericTexture.Height;
+            IsCubeMap = GenericTexture.ArrayCount == 6;
 
-            switch (GenericTexture.SurfaceType)
-            {
-                case STSurfaceType.Texture1D:
-                    TextureTarget = TextureTarget.Texture1D;
-                    break;
-                case STSurfaceType.Texture2D:
-                    TextureTarget = TextureTarget.Texture2D;
-                    break;
-                case STSurfaceType.Texture2D_Array:
-                    TextureTarget = TextureTarget.Texture2DArray;
-                    break;
-                case STSurfaceType.Texture2D_Mulitsample:
-                    TextureTarget = TextureTarget.Texture2DMultisample;
-                    break;
-                case STSurfaceType.Texture2D_Multisample_Array:
-                    TextureTarget = TextureTarget.Texture2DMultisampleArray;
-                    break;
-                case STSurfaceType.Texture3D:
-                    TextureTarget = TextureTarget.Texture3D;
-                    break;
-                case STSurfaceType.TextureCube:
-                    IsCubeMap = true;
-                    TextureTarget = TextureTarget.TextureCubeMap;
-                    break;
-                case STSurfaceType.TextureCube_Array:
-                    IsCubeMap = true;
-                    TextureTarget = TextureTarget.TextureCubeMapArray;
-                    break;
-            }
+            ApplySurfaceInformation(GenericTexture.SurfaceType);
 
             if (GenericTexture.ArrayCount == 0)
                 GenericTexture.ArrayCount = 1;
@@ -191,13 +165,8 @@ namespace Toolbox.Core
                 if (IsCubeMap)
                     TextureTarget = TextureTarget.TextureCubeMap;
 
-                //Force RGBA and use our library decoding for weird width/heights
-                //Open GL decoder has issues with certain width/heights
-
-                Console.WriteLine($"width pow {width} {IsPow2(width)}");
-                Console.WriteLine($"height pow {height} {IsPow2(height)}");
-
-                if (!IsPow2(width) || !IsPow2(height))
+                //Open GL decoder has issues with certain width/heights so use in tool converters if necessary
+                if ((!IsPow2(width) || !IsPow2(height)) && GenericTexture.IsBCNCompressed() || GenericTexture.IsASTC() || GenericTexture.Platform.OutputFormat == TexFormat.BC5_SNORM)
                     UseOpenGLDecoder = false;
 
                 pixelInternalFormat = PixelInternalFormat.Rgba;
@@ -205,9 +174,10 @@ namespace Toolbox.Core
 
                 if (GenericTexture.Platform is Imaging.CTRSwizzle ||
                     GenericTexture.Platform is Imaging.GamecubeSwizzle ||
-                    GenericTexture.Platform is Imaging.NitroSwizzle)
+                    GenericTexture.Platform is Imaging.NitroSwizzle || GenericTexture.IsASTC())
                 {
                     pixelFormat = OpenTK.Graphics.OpenGL.PixelFormat.Bgra;
+                    UseOpenGLDecoder = false;
                 }
                 else if (UseOpenGLDecoder)
                     SetPixelFormats(GenericTexture.Platform.OutputFormat);
@@ -228,15 +198,6 @@ namespace Toolbox.Core
 
                 TexID = GenerateOpenGLTexture(this, Surfaces);
 
-                if (IsCubeMap)
-                {
-                    TextureWrapS = TextureWrapMode.Clamp;
-                    TextureWrapT = TextureWrapMode.Clamp;
-                    TextureWrapR = TextureWrapMode.Clamp;
-                    TextureMinFilter = TextureMinFilter.LinearMipmapLinear;
-                    TextureMagFilter = TextureMagFilter.Linear;
-                }
-
                 Surfaces.Clear();
             }
             catch
@@ -245,6 +206,49 @@ namespace Toolbox.Core
                 GLInitialized = false;
                 return;
             }
+        }
+
+        private void ApplySurfaceInformation(STSurfaceType surfaceType)
+        {
+            switch (surfaceType)
+            {
+                case STSurfaceType.Texture1D:
+                    TextureTarget = TextureTarget.Texture1D;
+                    break;
+                case STSurfaceType.Texture2D:
+                    TextureTarget = TextureTarget.Texture2D;
+                    break;
+                case STSurfaceType.Texture2D_Array:
+                    TextureTarget = TextureTarget.Texture2DArray;
+                    break;
+                case STSurfaceType.Texture2D_Mulitsample:
+                    TextureTarget = TextureTarget.Texture2DMultisample;
+                    break;
+                case STSurfaceType.Texture2D_Multisample_Array:
+                    TextureTarget = TextureTarget.Texture2DMultisampleArray;
+                    break;
+                case STSurfaceType.Texture3D:
+                    TextureTarget = TextureTarget.Texture3D;
+                    break;
+                case STSurfaceType.TextureCube:
+                    IsCubeMap = true;
+                    TextureTarget = TextureTarget.TextureCubeMap;
+                    break;
+                case STSurfaceType.TextureCube_Array:
+                    IsCubeMap = true;
+                    TextureTarget = TextureTarget.TextureCubeMapArray;
+                    break;
+            }
+
+            if (IsCubeMap)
+            {
+                TextureWrapS = TextureWrapMode.Clamp;
+                TextureWrapT = TextureWrapMode.Clamp;
+                TextureWrapR = TextureWrapMode.Clamp;
+                TextureMinFilter = TextureMinFilter.LinearMipmapLinear;
+                TextureMagFilter = TextureMagFilter.Linear;
+            }
+
         }
 
         static bool IsPow2(int Value)
@@ -302,6 +306,7 @@ namespace Toolbox.Core
 
         private byte[] TryDecodeSurface(byte[] imageData, uint width, uint height, STGenericTexture texture) {
             imageData = texture.Platform.DecodeImage(texture, imageData, width, height, 0, 0);
+            Console.WriteLine($"TryDecodeSurface {texture.Platform.OutputFormat}");
             if (texture.Platform.OutputFormat != TexFormat.RGBA8_UNORM)
                 return STGenericTexture.DecodeBlock(imageData, width, height, texture.Platform.OutputFormat);
             else
@@ -410,8 +415,6 @@ namespace Toolbox.Core
             if (TexID == -1) return;
 
             GL.BindTexture(TextureTarget, TexID);
-
-            Console.WriteLine($"binding {TextureTarget} {TexID}");
         }
 
         private static int getImageSize(RenderableTex t)
@@ -441,7 +444,6 @@ namespace Toolbox.Core
 
         public unsafe Bitmap ToBitmap()
         {
-            Console.WriteLine($"width {width} height {height} pixelInternalFormat {pixelInternalFormat}");
             Bitmap bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             System.Drawing.Imaging.BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.WriteOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             GL.BindTexture(TextureTarget.Texture2D, TexID);

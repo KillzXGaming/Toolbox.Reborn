@@ -44,7 +44,7 @@ namespace GCNLibrary.WW
             var file = new FileEntry()
             {
                 Type = type,
-                FileName = $"RawFiles/{name}_File{Files.Count}{extension}",
+                FileName = $"Root/RawFiles/{name}_File{Files.Count}{extension}",
             };
             file.SetData(data);
             Files.Add(file);

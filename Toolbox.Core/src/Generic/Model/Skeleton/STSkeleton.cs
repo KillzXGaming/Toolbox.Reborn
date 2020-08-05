@@ -113,7 +113,6 @@ namespace Toolbox.Core
                 ConvertWorldToLocalSpace(bone);
 
             Reset();
-            Update();
         }
 
         private void ConvertWorldToLocalSpace(STBone bone)

@@ -33,11 +33,17 @@ namespace Toolbox.Core.Imaging
 
         public byte[] DecodeImage(STGenericTexture texture, byte[] data, uint width, uint height, int array, int mip) {
 
+            if (data.Length == 0)
+                throw new Exception("Data is empty! Failed to swizzle image!");
+
             if (BlockHeightLog2 == 0)
             {
                 uint blkHeight = TextureFormatHelper.GetBlockHeight(OutputFormat);
                 uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(texture.Height, blkHeight));
-                BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
+                BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length ;
+
+                if (OutputFormat != TexFormat.ASTC_8x5_UNORM)
+                    BlockHeightLog2 -= 1;
             }
 
             return TegraX1Swizzle.GetImageData(texture, data, array, mip, 0, BlockHeightLog2, Target, LinearMode);

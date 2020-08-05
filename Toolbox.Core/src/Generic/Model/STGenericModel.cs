@@ -35,6 +35,11 @@ namespace Toolbox.Core
         public List<STGenericTexture> Textures = new List<STGenericTexture>();
 
         /// <summary>
+        /// The parent resouce which can store multiple models.
+        /// </summary>
+        public STGenericScene ParentResource { get; set; }
+
+        /// <summary>
         /// The skeleton of the model used to store a list of <see cref="STBone"/>.
         /// Used for rendering and exporting bone data.
         /// </summary>
@@ -44,6 +49,9 @@ namespace Toolbox.Core
             Name = name;
         }
 
+        /// <summary>
+        /// Gets a list of all the materials used in all the polygon groups.
+        /// </summary>
         public List<STGenericMaterial> GetMaterials()
         {
             List<STGenericMaterial> materials = new List<STGenericMaterial>();
@@ -56,6 +64,52 @@ namespace Toolbox.Core
                 }
             }
             return materials;
+        }
+
+        /// <summary>
+        /// Gets a list of textures being used in the model.
+        /// This will also search for external textures cached in memory if any are present.
+        /// </summary>
+        public List<STGenericTexture> GetMappedTextures()
+        {
+            List<STGenericTexture> textures = new List<STGenericTexture>();
+            textures.AddRange(Textures);
+            if (ParentResource != null)
+                textures.AddRange(ParentResource.Textures);
+
+            return textures;
+        }
+
+        /// <summary>
+        /// Reorders the bones from the skeleton and adjusts the vertex indices.
+        /// </summary>
+        /// <param name="bones"></param>
+        public void OrderBones(List<STBone> bones)
+        {
+            //Prevent duplicate vertex instances being altered
+            List<STVertex> vertexBank = new List<STVertex>();
+
+            foreach (var mesh in Meshes) {
+                for (int v = 0; v < mesh.Vertices.Count; v++) {
+                    if (vertexBank.Contains(mesh.Vertices[v]))
+                        continue;
+
+                    vertexBank.Add(mesh.Vertices[v]);
+                    for (int j = 0; j < mesh.Vertices[v].BoneIndices.Count; j++) {
+                        //Get our current index
+                        var boneIndex = mesh.Vertices[v].BoneIndices[j];
+                        //Get the bone name
+                        var boneName = Skeleton.Bones[boneIndex].Name;
+                        //Find a match in our new list
+                        var newIndex = bones.FindIndex(x => x.Name == boneName);
+                        //Set the new bone index
+                        mesh.Vertices[v].BoneIndices[j] = newIndex;
+                    }
+                }
+            }
+            vertexBank.Clear();
+
+            Skeleton.Bones = bones;
         }
 
         public ObjectTreeNode CreateTreeHiearchy()

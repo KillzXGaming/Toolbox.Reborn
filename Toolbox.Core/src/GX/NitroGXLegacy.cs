@@ -344,7 +344,7 @@ namespace Toolbox.Core.Nitro
 
             internal void PushNormal()
             {
-                GL.Vertex3(sNormal.X, sNormal.Y, sNormal.Z);
+                GL.Normal3(sNormal.X, sNormal.Y, sNormal.Z);
             }
 
             internal void PushTexCoords()

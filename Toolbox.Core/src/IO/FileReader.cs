@@ -210,6 +210,14 @@ namespace Toolbox.Core.IO
             return ReadByte() / 255.0f;
         }
 
+        public float[] ReadHalfSingles(int count)
+        {
+            float[] values = new float[count];
+            for (int i = 0; i < count; i++)
+                values[i] = ReadHalfSingle();
+            return values;
+        }
+
         public float ReadHalfSingle()
         {
             return new Syroot.IOExtension.Half(ReadUInt16());
@@ -433,10 +441,18 @@ namespace Toolbox.Core.IO
             zlibStream.Close();
             return stream.ToArray();
         }
+
         public string ReadMagic(int Offset, int Length)
         {
             Seek(Offset, SeekOrigin.Begin);
             return ReadString(Length);
+        }
+
+        public ushort ReadUInt16(long position)
+        {
+            using (TemporarySeek(position, SeekOrigin.Begin)) {
+                return ReadUInt16();
+            }
         }
     }
 }

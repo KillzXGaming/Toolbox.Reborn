@@ -1,0 +1,50 @@
+Archive Files
+ - SWU
+ - NARC
+ - ZSI
+Effect Files
+- PTCL
+- EFCF
+- EFF
+- ESET
+- XLINK
+Audio Files
+ - All 
+Model Files
+ - MKAGPDX_BIN
+ - BMD
+ - BCRES
+ - BCH
+ - G1M
+ - LM2/LM3
+ - GLG/RLG
+ - MOD
+ - GFBMDL		
+Collision Files
+- KCL
+Texture Files
+
+Shader Files
+- SHARC
+- SHARCFB
+- BFSHA
+- BNSH
+- NUSHDB
+- NVNSH
+Font Data
+- BXFNT
+- BFTTF
+Message Data
+- MSBP
+- MSBT
+- MSBT (DKCTF)
+Layout Data
+- BXLYT
+- BXLAN
+- BLO
+Misc
+- GFBANM
+- MK8 Mini Map
+- AAMP
+- BYAML
+- BCSV

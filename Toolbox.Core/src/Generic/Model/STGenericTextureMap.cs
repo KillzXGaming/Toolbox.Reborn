@@ -45,9 +45,9 @@ namespace Toolbox.Core
         {
             foreach (var container in Runtime.ModelContainers)
             {
-                foreach (var model in container.ModelList)
+                foreach (var model in container.Models)
                 {
-                    foreach (var tex in model.ToGeneric().Textures)
+                    foreach (var tex in model.GenericModel.Textures)
                     {
                         if (tex.Name == Name)
                             return tex;

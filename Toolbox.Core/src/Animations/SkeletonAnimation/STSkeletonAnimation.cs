@@ -54,7 +54,7 @@ namespace Toolbox.Core.Animations
                         position.X = boneAnim.TranslateX.GetFrameValue(Frame);
                     if (boneAnim.TranslateY.HasKeys)
                         position.Y = boneAnim.TranslateY.GetFrameValue(Frame);
-                    if (boneAnim.TranslateY.HasKeys)
+                    if (boneAnim.TranslateZ.HasKeys)
                         position.Z = boneAnim.TranslateZ.GetFrameValue(Frame);
 
                     if (boneAnim.ScaleX.HasKeys)

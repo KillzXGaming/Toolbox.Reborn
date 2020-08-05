@@ -13,7 +13,7 @@ namespace GCNLibrary.LM
 {
     public class KEY : STAnimation, IFileFormat, IConvertableTextFormat
     {
-        public bool CanSave { get; set; } = true;
+        public bool CanSave { get; set; } = false;
 
         public string[] Description { get; set; } = new string[] { "LM Skeletal Animation" };
         public string[] Extension { get; set; } = new string[] { "*.key" };
@@ -43,6 +43,7 @@ namespace GCNLibrary.LM
             this.Name = FileInfo.FileName;
             this.Loop = Header.Flags == 2;
 
+            FrameRate = 30.0f;
             FrameCount = Header.FrameCount;
             Name = FileInfo.FileName;
             foreach (var joinAnim in Header.AnimJoints) {
@@ -297,7 +298,7 @@ namespace GCNLibrary.LM
                     {
                        Frame = keyFrame.Frame,
                        Value = keyFrame.Value,
-                        TangentIn = keyFrame.InSlope,
+                       TangentIn = keyFrame.InSlope,
                        TangentOut = keyFrame.OutSlope,
                     });
                 }

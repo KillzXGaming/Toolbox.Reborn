@@ -65,7 +65,7 @@ namespace GCNLibrary
 
                 SetFileNames(entries, 1, entries.Count, "");
 
-                for (int i = 0; i < entries.Count - 1; i++)
+                for (int i = 0; i < entries.Count; i++)
                 {
                     if (entries[i].nodeType != NodeEntry.NodeType.Directory)
                     {

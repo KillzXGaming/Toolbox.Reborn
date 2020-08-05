@@ -303,16 +303,22 @@ namespace Toolbox.Core
                 return;
             }
 
+            var masks = DDS_RGBA.GetMasks(format);
+            PfHeader.RBitMask = masks[0];
+            PfHeader.GBitMask = masks[1];
+            PfHeader.BBitMask = masks[2];
+            PfHeader.ABitMask = masks[3];
+
+            PfHeader.RgbBitCount = 0x8 * TextureFormatHelper.GetBytesPerPixel(format);
+            PfHeader.Flags = (uint)(DDPF.RGB | DDPF.ALPHAPIXELS);
+
             switch (format)
             {
                 case TexFormat.RGBA8_UNORM:
                 case TexFormat.RGB8_SRGB:
+                    break;
+                case TexFormat.RGB565_UNORM:
                     PfHeader.Flags = (uint)(DDPF.RGB | DDPF.ALPHAPIXELS);
-                    PfHeader.RgbBitCount = 0x8 * 4;
-                    PfHeader.RBitMask = 0x000000FF;
-                    PfHeader.GBitMask = 0x0000FF00;
-                    PfHeader.BBitMask = 0x00FF0000;
-                    PfHeader.ABitMask = 0xFF000000;
                     break;
                 case TexFormat.BC1_SRGB:
                 case TexFormat.BC1_UNORM:
@@ -391,11 +397,6 @@ namespace Toolbox.Core
                 PfHeader = reader.ReadStruct<DDSPFHeader>();
                 if (IsDX10)
                     Dx10Header = reader.ReadStruct<DX10Header>();
-
-                int Dx10Size = IsDX10 ? 20 : 0;
-
-                reader.TemporarySeek((int)(4 + MainHeader.Size + Dx10Size), SeekOrigin.Begin);
-                ImageData = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
 
                 byte[] Components = new byte[4] { 0, 1, 2, 3 };
 

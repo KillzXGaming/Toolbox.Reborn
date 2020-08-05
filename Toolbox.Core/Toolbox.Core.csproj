@@ -17,13 +17,8 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="External\**" />
-    <EmbeddedResource Remove="External\**" />
-    <None Remove="External\**" />
-  </ItemGroup>
-  <ItemGroup>
+    <Folder Include="External\" />
     <Folder Include="src\FileFormats\Exportable\FBX\" />
-    <Folder Include="src\GX\TriStrip\" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
@@ -34,13 +29,13 @@
 
   <ItemGroup>
     <Reference Include="OpenTK">
-      <HintPath>..\External\OpenTK.dll</HintPath>
+      <HintPath>External\Framework\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.BinaryData">
-      <HintPath>..\External\Syroot.BinaryData.dll</HintPath>
+      <HintPath>External\Framework\Syroot.BinaryData.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.Maths">
-      <HintPath>..\External\Syroot.Maths.dll</HintPath>
+      <HintPath>External\Framework\Syroot.Maths.dll</HintPath>
     </Reference>
   </ItemGroup>
 

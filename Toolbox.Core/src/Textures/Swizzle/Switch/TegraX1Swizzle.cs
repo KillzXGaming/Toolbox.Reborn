@@ -72,6 +72,7 @@ namespace Toolbox.Core.Switch
             uint blkDepth = texture.GetBlockDepth();
             uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(texture.Height, blkHeight));
             uint BlockHeightLog2 = (uint)Convert.ToString(blockHeight, 2).Length - 1;
+
             return GetImageData(texture, ImageData, ArrayLevel, MipLevel, DepthLevel, BlockHeightLog2, target, LinearTileMode);
         }
 
@@ -84,7 +85,7 @@ namespace Toolbox.Core.Switch
             uint blkDepth = texture.GetBlockDepth();
             uint blockHeight = TegraX1Swizzle.GetBlockHeight(TegraX1Swizzle.DIV_ROUND_UP(texture.Height, blkHeight));
 
-            Console.WriteLine($"format {format} {bpp} {blkWidth} {blkHeight} {blockHeight}");
+            Console.WriteLine($"format {format} {bpp} {blkWidth} {blkHeight} blockHeight {blockHeight} BlockHeightLog2 {BlockHeightLog2} ImageData {ImageData.Length}");
 
             uint Pitch = 0;
             uint DataAlignment = 512;

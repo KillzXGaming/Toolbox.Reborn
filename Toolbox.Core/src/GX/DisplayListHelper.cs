@@ -49,9 +49,14 @@ namespace Toolbox.Core.GX
         }
 
         public static List<STVertex> ReadDisplayLists(Stream stream, Stream dataStream, 
-            GXVertexLayout[] layouts, Config config = null)
+            GXVertexLayout[] layouts, Config config = null, ushort[] matrixIndices = null)
         {
             if (config == null) config = new Config();
+
+            int numColors = GetColorCount(layouts);
+            int numTexCoords = GetTexCoordsCount(layouts);
+
+            bool hasVertexColors = layouts.Any(x => x.Attribute == GXAttributes.Color0);
 
             List<GXOpCodes> operations = new List<GXOpCodes>();
 
@@ -76,13 +81,13 @@ namespace Toolbox.Core.GX
                     ushort numVertices = reader.ReadUInt16();
                     for (int v = 0; v < numVertices; v++) {
                         STVertex vertex = new STVertex();
-                        vertex.TexCoords = new OpenTK.Vector2[GetTexCoordsCount(layouts)];
-                        if (layouts.Any(x => x.Attribute == GXAttributes.Color0))
-                            vertex.Colors = new OpenTK.Vector4[GetColorCount(layouts)];
+                        vertex.TexCoords = new OpenTK.Vector2[numTexCoords];
+                        if (hasVertexColors)
+                            vertex.Colors = new OpenTK.Vector4[numColors];
 
                         for (int l = 0; l < layouts.Length; l++) {
                             var index = ReadLayout(reader, layouts[l]);
-                            ParseData(vertex, dataReader, layouts[l], index);
+                            ParseData(vertex, dataReader, layouts[l], index, matrixIndices);
                         }
                         verts.Add(vertex);
                     }
@@ -216,7 +221,7 @@ namespace Toolbox.Core.GX
             return outVertices;
         }
 
-        private static void ParseData(STVertex vertex, FileReader dataReader, GXVertexLayout layout, int index)
+        private static void ParseData(STVertex vertex, FileReader dataReader, GXVertexLayout layout, int index, ushort[] matrixIndices)
         {
             int numElements = GetElementCount(layout.Attribute);
             int stride = GetDataStride(layout.CompType) * numElements;
@@ -256,7 +261,7 @@ namespace Toolbox.Core.GX
                             int channel = (int)(layout.Attribute - GXAttributes.TexCoord0);
                             float X = ReadDataLayout(dataReader, layout);
                             float Y = ReadDataLayout(dataReader, layout);
-                            vertex.TexCoords[0] = new OpenTK.Vector2(X, Y);
+                            vertex.TexCoords[channel] = new OpenTK.Vector2(X, Y);
                         }
                         break;
                     case GXAttributes.Color0:
@@ -271,6 +276,10 @@ namespace Toolbox.Core.GX
                         {
                             if (index != -1) {
                                 int boneID = index / 3;
+                                if (matrixIndices != null)
+                                    boneID = matrixIndices[index / 3];
+                                Console.WriteLine($"BONEID {index} real {boneID}");
+
                                 vertex.BoneIndices.Add(boneID);
                                 vertex.BoneWeights.Add(1.0f);
                             }
@@ -421,16 +430,16 @@ namespace Toolbox.Core.GX
             {
                 case GXComponentType.RGBA8:
                     return new Vector4(
-                        reader.ReadByte() / 0xFF, reader.ReadByte() / 0xFF,
-                        reader.ReadByte() / 0xFF, reader.ReadByte() / 0xFF);
+                        reader.ReadByte() / 255.0f, reader.ReadByte() / 255.0f,
+                        reader.ReadByte() / 255.0f, reader.ReadByte() / 255.0f);
                 case GXComponentType.RGB8:
                     return new Vector4(
-                        reader.ReadByte() / 0xFF, reader.ReadByte() / 0xFF,
-                        reader.ReadByte() / 0xFF, 1.0f);
+                        reader.ReadByte() / 255.0f, reader.ReadByte() / 255.0f,
+                        reader.ReadByte() / 255.0f, 1.0f);
                 case GXComponentType.RGBX8:
                     return new Vector4(
-                        reader.ReadByte() / 0xFF, reader.ReadByte() / 0xFF,
-                        reader.ReadByte() / 0xFF, 1.0f);
+                        reader.ReadByte() / 255.0f, reader.ReadByte() / 255.0f,
+                        reader.ReadByte() / 255.0f, 1.0f);
                 case GXComponentType.RGB565:
                     {
                         short value = reader.ReadInt16();

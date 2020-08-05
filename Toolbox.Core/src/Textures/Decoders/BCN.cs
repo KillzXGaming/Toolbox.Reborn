@@ -10,6 +10,7 @@ namespace Toolbox.Core.Imaging
         public bool Decode(TexFormat format, byte[] input, int width, int height, out byte[] output)
         {
            output = null;
+            return false;   
             switch (format)
             {
                 case TexFormat.BC1_UNORM:

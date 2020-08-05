@@ -4,7 +4,7 @@ using Toolbox.Core.IO;
 
 namespace GCNLibrary.LM.MDL
 {
-    public class ShapePacket : ISection 
+    public class ShapePacket : ISection
     {
         public uint DataOffset;
         public uint DataSize;
@@ -29,7 +29,8 @@ namespace GCNLibrary.LM.MDL
             MatrixIndicesCount = reader.ReadUInt16();
             MatrixIndices = reader.ReadUInt16s(10);
 
-            using (reader.TemporarySeek(DataOffset, System.IO.SeekOrigin.Begin)) {
+            using (reader.TemporarySeek(DataOffset, System.IO.SeekOrigin.Begin))
+            {
                 Data = reader.ReadBytes((int)DataSize);
             }
         }
@@ -46,13 +47,15 @@ namespace GCNLibrary.LM.MDL
         public byte[] CreateDrawList(List<DrawList> drawLists, bool IsLOD, bool hasNormals, bool hasTexCoords, bool hasColors)
         {
             var mem = new System.IO.MemoryStream();
-            using (var writer = new FileWriter(mem)) {
+            using (var writer = new FileWriter(mem))
+            {
                 writer.SetByteOrder(true);
                 foreach (var drawList in drawLists)
                 {
                     writer.Write(drawList.OpCode);
                     writer.Write((ushort)drawList.Vertices.Count);
-                    for (int v = 0; v < drawList.Vertices.Count; v++) {
+                    for (int v = 0; v < drawList.Vertices.Count; v++)
+                    {
                         var vertex = drawList.Vertices[v];
 
                         if (IsLOD)
@@ -100,6 +103,22 @@ namespace GCNLibrary.LM.MDL
             public short BinormalIndex { get; set; } = -1;
             public short ColorIndex { get; set; } = -1;
             public short TexCoordIndex { get; set; } = -1;
+
+            public VertexGroup() { }
+
+            public VertexGroup(VertexGroup src)
+            {
+                MatrixDataIndex = src.MatrixDataIndex;
+                MatrixIndex = src.MatrixIndex;
+                Tex0MatrixIndex = src.Tex0MatrixIndex;
+                Tex1MatrixIndex = src.Tex1MatrixIndex;
+                PositionIndex = src.PositionIndex;
+                NormalIndex = src.NormalIndex;
+                TangentIndex = src.TangentIndex;
+                BinormalIndex = src.BinormalIndex;
+                ColorIndex = src.ColorIndex;
+                TexCoordIndex = src.TexCoordIndex;
+            }
         }
     }
 }

@@ -41,6 +41,16 @@ namespace Toolbox.Core.OpenGL
             }
         }
 
+        public string Name
+        {
+            get
+            {
+                if (Scene.Name != null) return Scene.Name;
+                else
+                    return Scene.Models[0].Name;
+            }
+        }
+
         /// <summary>
         /// A list of meshes used for rendering.
         /// </summary>
@@ -50,11 +60,6 @@ namespace Toolbox.Core.OpenGL
         /// The scene object containing multiple models.
         /// </summary>
         public STGenericScene Scene;
-
-        /// <summary>
-        /// The model object loaded and made into this renderer.
-        /// </summary>
-        public STGenericModel Model;
 
         /// <summary>
         /// The skeleton renderer for rendering skeletons from the model.
@@ -74,9 +79,10 @@ namespace Toolbox.Core.OpenGL
         }
 
         public ModelRenderer(STGenericModel model) {
-            Model = model;
+            Scene = new STGenericScene();
+            Scene.Models.Add(model);
 
-            foreach (var mesh in Model.Meshes)
+            foreach (var mesh in model.Meshes)
                 Meshes.Add(new MeshRender(mesh, this));
 
             SkeletonRender = new SkeletonRenderer(model);
@@ -124,8 +130,10 @@ namespace Toolbox.Core.OpenGL
 
         public void SetDefaultUniforms(ShaderProgram shader)
         {
-            SetBoneUniforms(shader, Model.Skeleton);
-            SetRenderSettings(shader);
+            foreach (var model in Scene.Models) {
+                SetBoneUniforms(shader, model.Skeleton);
+                SetRenderSettings(shader);
+            }
         }
 
         private void SetBoneUniforms(ShaderProgram shader, STSkeleton Skeleton)
@@ -146,6 +154,9 @@ namespace Toolbox.Core.OpenGL
             shader.SetBoolToInt("renderVertColor", DisplayVertexColors);
             shader.SetBoolToInt("renderVertAlpha", DisplayVertexColorAlpha);
             shader.SetColor("diffuseColor", STColor8.White.Color);
+            shader.SetBoolToInt("HasSkeleton", false);
+            if (Scene.Models.Count > 0)
+                shader.SetBoolToInt("HasSkeleton", Scene.Models.Any(x => x.Skeleton.Bones.Count > 0));
         }
 
         public virtual void SetMaterialUniforms(ShaderProgram shader, STGenericMaterial material, STGenericMesh mesh) {
@@ -158,30 +169,34 @@ namespace Toolbox.Core.OpenGL
         public virtual void RenderMaterials(ShaderProgram shader, 
             STGenericMesh mesh,  STPolygonGroup group, STGenericMaterial material, Vector4 highlight_color)
         {
-            if (material == null && group.MaterialIndex != -1 && Model.Materials.Count > group.MaterialIndex)
-                material = Model.Materials[group.MaterialIndex];
-
-            shader.SetVector4("highlight_color", highlight_color);
-
-            SetTextureUniforms(shader);
-            SetMaterialUniforms(shader, material, mesh);
-            if (material == null) return;
-
-            int textureUintID = 1;
-            foreach (var textureMap in material.TextureMaps)
+            foreach (var model in Scene.Models)
             {
-                var tex = textureMap.GetTexture();
-                if (textureMap.Type == STTextureType.Diffuse) {
-                    shader.SetBoolToInt("hasDiffuse", true);
-                    BindTexture(shader, Model.Textures, textureMap, textureUintID);
-                    shader.SetInt($"tex_Diffuse", textureUintID);
-                }
+                if (material == null && group.MaterialIndex != -1 && model.Materials.Count > group.MaterialIndex)
+                    material = model.Materials[group.MaterialIndex];
 
-                textureUintID++;
+                shader.SetVector4("highlight_color", highlight_color);
+
+                SetTextureUniforms(shader);
+                SetMaterialUniforms(shader, material, mesh);
+                if (material == null) return;
+
+                int textureUintID = 1;
+                foreach (var textureMap in material.TextureMaps)
+                {
+                    var tex = textureMap.GetTexture();
+                    if (textureMap.Type == STTextureType.Diffuse)
+                    {
+                        shader.SetBoolToInt("hasDiffuse", true);
+                        BindTexture(shader, model.GetMappedTextures(), textureMap, textureUintID);
+                        shader.SetInt($"tex_Diffuse", textureUintID);
+                    }
+
+                    textureUintID++;
+                }
             }
         }
 
-        private void SetTextureUniforms(ShaderProgram shader)
+        public void SetTextureUniforms(ShaderProgram shader)
         {
             shader.SetInt("debugOption", 2);
             
@@ -199,7 +214,7 @@ namespace Toolbox.Core.OpenGL
             GL.BindTexture(TextureTarget.Texture2D, RenderTools.uvTestPattern.RenderableTex.TexID);
         }
 
-        private static bool BindTexture(ShaderProgram shader, List<STGenericTexture> textures,
+        public static bool BindTexture(ShaderProgram shader, List<STGenericTexture> textures,
                STGenericTextureMap texture, int id)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + id);
@@ -209,6 +224,12 @@ namespace Toolbox.Core.OpenGL
                 if (textures[i].Name == texture.Name)
                     BindGLTexture(textures[i], texture, shader);
             }
+            for (int i = 0; i < Runtime.TextureCache.Count; i++)
+            {
+                if (Runtime.TextureCache[i].Name == texture.Name)
+                    BindGLTexture(Runtime.TextureCache[i], texture, shader);
+            }
+
             return false;
         }
 
@@ -257,7 +278,7 @@ namespace Toolbox.Core.OpenGL
                     break;
             }
 
-            GL.Disable(EnableCap.CullFace);
+          //  GL.Disable(EnableCap.CullFace);
 
             msh.vao.Enable();
             msh.vao.Use();
@@ -266,7 +287,7 @@ namespace Toolbox.Core.OpenGL
                 DrawElementsType.UnsignedInt,
                 group.FaceOffset);
 
-            GL.Enable(EnableCap.CullFace);
+          //  GL.Enable(EnableCap.CullFace);
         }
 
         public virtual void PrepareShaders()
@@ -345,6 +366,9 @@ namespace Toolbox.Core.OpenGL
                     FragColor.rgb = vec3(displayTexCoord.y,displayTexCoord.x, 1.0f);
                 if (renderType == DisplayUVPattern)
                     FragColor.rgb = texture(UVTestPattern,displayTexCoord).rgb;
+
+                float hc_a   = highlight_color.w;
+                FragColor = vec4(FragColor.rgb * (1-hc_a) + highlight_color.rgb * hc_a, FragColor.a);
             }
         ";
 
@@ -412,7 +436,7 @@ namespace Toolbox.Core.OpenGL
             uniform mat4 mtxCam;
 
             // Skinning uniforms
-            uniform mat4 bones[200];
+            uniform mat4 bones[230];
 
             // Bone Weight Display
             uniform sampler2D weightRamp1;
@@ -520,6 +544,11 @@ namespace Toolbox.Core.OpenGL
             { "vWeight", 5 },
             { "vTangent", 6 },
             { "vBinormal", 7 },
+            { "vTexCoord1", 8 },
+            { "vTexCoord2", 9 },
+            { "vTexCoord3", 10 },
+            { "vTexCoord4", 11 },
+            { "vTexCoord5", 12 },
         };
     }
 
@@ -638,14 +667,30 @@ namespace Toolbox.Core.OpenGL
                 Attributes.Add(new VertexAttribute("vTangent", 4, VertexAttribPointerType.Float, false));
             if (Renderer.SupportsBinormals)
                 Attributes.Add(new VertexAttribute("vBinormal", 4, VertexAttribPointerType.Float, false));
+
+            if (Mesh.Vertices.Count > 0)
+            {
+                int numTexCoords = Mesh.Vertices[0].TexCoords.Length;
+                Console.WriteLine($"numTexCoords {numTexCoords}");
+                for (int i = 0; i < numTexCoords - 1; i++)
+                {
+                    Attributes.Add(new VertexAttribute($"vTexCoord{i + 1}", 2, VertexAttribPointerType.Float, false));
+                }
+            }
         }
 
         private int[] CreateIndexBuffer(STGenericMesh mesh)
         {
+            int polyOffset = 0;
+
             List<int> indices = new List<int>();
             foreach (var poly in mesh.PolygonGroups) {
+                poly.FaceOffset = polyOffset * sizeof(int);
+
                 for (int f = 0; f < poly.Faces.Count; f++)
                     indices.Add((int)poly.Faces[f]);
+
+                polyOffset += poly.Faces.Count;
             }
             return indices.ToArray();
         }
@@ -712,6 +757,12 @@ namespace Toolbox.Core.OpenGL
                     list.Add(mesh.Vertices[i].Bitangent.X);
                     list.Add(mesh.Vertices[i].Bitangent.Y);
                     list.Add(mesh.Vertices[i].Bitangent.Z);
+                }
+
+                for (int t = 0; t < mesh.Vertices[i].TexCoords.Length - 1; t++)
+                {
+                    list.Add(mesh.Vertices[i].TexCoords[t + 1].X);
+                    list.Add(mesh.Vertices[i].TexCoords[t + 1].Y);
                 }
             }
             return list.ToArray();

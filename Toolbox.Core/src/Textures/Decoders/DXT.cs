@@ -9,7 +9,6 @@ namespace Toolbox.Core.TextureDecoding
     //Huge thanks to gdkchan and AbooodXD for the method of decomp BC5/BC4.
 
     //Todo. Add these to DDS code and add in methods to compress and decode more formats
-    //BC4 breaks a bit with artifacts so i'll need to go back and fix
 
     public class DXT
     {
@@ -62,7 +61,7 @@ namespace Toolbox.Core.TextureDecoding
                 {
                     int IOffs = (Y * W + X) * 16;
 
-                    byte[] Tile = BCnDecodeTile(data, IOffs, false);
+                    byte[] Tile = BCnDecodeTile(data, IOffs + 8, false);
 
                     int AlphaLow = Get32(data, IOffs + 0);
                     int AlphaHigh = Get32(data, IOffs + 4);
@@ -79,9 +78,9 @@ namespace Toolbox.Core.TextureDecoding
 
                             int OOffset = (X * 4 + TX + (Y * 4 + TY) * W * 4) * 4;
 
-                            Output[OOffset + 0] = Tile[TOffset + 0];
+                            Output[OOffset + 2] = Tile[TOffset + 0];
                             Output[OOffset + 1] = Tile[TOffset + 1];
-                            Output[OOffset + 2] = Tile[TOffset + 2];
+                            Output[OOffset + 0] = Tile[TOffset + 2];
                             Output[OOffset + 3] = (byte)(Alpha | (Alpha << 4));
 
                             TOffset += 4;
@@ -161,7 +160,10 @@ namespace Toolbox.Core.TextureDecoding
                     Red[0] = data[IOffs + 0];
                     Red[1] = data[IOffs + 1];
 
-                    CalculateBC3Alpha(Red);
+                    if (IsSNORM)
+                        CalculateBC3AlphaS(Red);
+                    else
+                        CalculateBC3Alpha(Red);
 
                     int RedLow = Get32(data, IOffs + 2);
                     int RedHigh = Get16(data, IOffs + 6);
@@ -244,6 +246,7 @@ namespace Toolbox.Core.TextureDecoding
                         {
                             for (int TX = 0; TX < TW; TX++)
                             {
+
                                 int Shift = TY * 12 + TX * 3;
                                 int OOffset = ((Y * 4 + TY) * width + (X * 4 + TX)) * 4;
 
@@ -262,7 +265,7 @@ namespace Toolbox.Core.TextureDecoding
 
                                 Output[OOffset + 0] = Clamp((NX + 1) * 0.5f);
                                 Output[OOffset + 1] = Clamp((NY + 1) * 0.5f);
-                                Output[OOffset + 2] = 0;
+                                Output[OOffset + 2] = Clamp((NZ + 1) * 0.5f);
                                 Output[OOffset + 3] = 0xff;
                             }
                         }

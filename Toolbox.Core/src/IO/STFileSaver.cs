@@ -25,6 +25,8 @@ namespace Toolbox.Core.IO
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
 
+            fileFormat.FileInfo.FilePath = fileName;
+
             if (fileFormat.FileInfo.KeepOpen && File.Exists(fileName))
             {
                 string savedPath = Path.GetDirectoryName(fileName);

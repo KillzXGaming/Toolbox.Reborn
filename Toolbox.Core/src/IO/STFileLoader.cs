@@ -39,6 +39,9 @@ namespace Toolbox.Core.IO
 
         public static Settings TryDecompressFile(Stream stream, string fileName)
         {
+            //File is empty so return
+            if (stream == null || stream.Length < 8) return new Settings();
+
             long streamStartPos = stream.Position;
 
             Settings settings = new Settings();

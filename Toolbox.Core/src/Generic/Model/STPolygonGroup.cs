@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Toolbox.Core
@@ -46,5 +47,30 @@ namespace Toolbox.Core
         /// Gets or sets the primitive type to be displayed for faces.
         /// </summary>
         public STPrimitiveType PrimitiveType { get; set; } = STPrimitiveType.Triangles;
+
+        public T SeperatePolygonGroup<T>(STGenericMesh mesh, int index)
+           where T : STGenericMesh, new()
+        {
+            T newMesh = new T();
+            newMesh.Name = index == 0 ? mesh.Name : $"{mesh.Name}_{index}";
+
+            Dictionary<STVertex, int> verticesNew = new Dictionary<STVertex, int>();
+
+            STPolygonGroup group = new STPolygonGroup();
+            group.Material = this.Material;
+            group.MaterialIndex = this.MaterialIndex;
+            newMesh.PolygonGroups.Add(group);
+
+            for (int i = 0; i < Faces.Count; i++)
+            {
+                if (!verticesNew.ContainsKey(mesh.Vertices[(int)Faces[i]]))
+                    verticesNew.Add(mesh.Vertices[(int)Faces[i]], verticesNew.Count);
+
+                group.Faces.Add(Faces[i]);
+            }
+
+            newMesh.Vertices = verticesNew.Keys.ToList();
+            return newMesh;
+        }
     }
 }

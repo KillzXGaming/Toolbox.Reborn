@@ -94,6 +94,7 @@ namespace Toolbox.Core
         public static List<IArchiveFile> ArchiveFiles = new List<IArchiveFile>();
 
         public static List<ModelContainer> ModelContainers = new List<ModelContainer>();
+        public static List<STGenericTexture> TextureCache = new List<STGenericTexture>();
 
         //GUI based editors
         //While multiple GUI frameworks can be used, they should still share the same editors
@@ -186,8 +187,6 @@ namespace Toolbox.Core
 
         public class ImageEditor
         {
-            public static Color CustomPicureBoxBGColor = Color.DarkCyan;
-
             public static PictureBoxBG pictureBoxStyle = PictureBoxBG.Checkerboard;
 
             public static bool PreviewGammaFix = false;
@@ -195,6 +194,7 @@ namespace Toolbox.Core
             public static bool ShowPropertiesPanel = true;
             public static bool DisplayVertical = false;
 
+            public static Color BackgroundColor = Color.White;
 
             public static bool DisplayAlpha = true;
             public static bool UseComponetSelector = true;

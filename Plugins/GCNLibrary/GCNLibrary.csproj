@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>C:\Users\Nathan\Documents\GitHub\GLEngine\Toolbox.Reborn\Toolbox.Winforms\bin\Debug\Plugins\</OutputPath>
+    <OutputPath>C:\Users\Nathan\source\repos\ToolboxReborn\Toolbox.Winforms\bin\Debug\Plugins\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
@@ -13,20 +13,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Toolbox.Core\Toolbox.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\External\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Toolbox.Core\External\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK">
-      <HintPath>..\..\External\OpenTK.dll</HintPath>
+      <HintPath>..\Toolbox.Core\External\Framework\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="SharpYaml">
-      <HintPath>..\..\External\SharpYaml.dll</HintPath>
+      <HintPath>..\Toolbox.Core\External\SharpYaml.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.BinaryData">
-      <HintPath>..\..\External\Syroot.BinaryData.dll</HintPath>
+      <HintPath>..\Toolbox.Core\External\Syroot.BinaryData.dll</HintPath>
     </Reference>
     <Reference Include="Syroot.Maths">
-      <HintPath>..\..\External\Syroot.Maths.dll</HintPath>
+      <HintPath>..\Toolbox.Core\External\Syroot.Maths.dll</HintPath>
     </Reference>
   </ItemGroup>
 
@@ -34,10 +38,6 @@
     <Folder Include="LM\DOL\" />
     <Folder Include="LM\TXP\" />
     <Folder Include="Textures\WTB\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

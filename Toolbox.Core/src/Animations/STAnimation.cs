@@ -32,6 +32,11 @@ namespace Toolbox.Core.Animations
         public float FrameCount { get; set; }
 
         /// <summary>
+        /// The rate of frames per second to play back in the animation.
+        /// </summary>
+        public float FrameRate { get; set; } = 60.0f;
+
+        /// <summary>
         /// Whether the animation will loop or not after
         /// the playback rearches the total frame count.
         /// </summary>

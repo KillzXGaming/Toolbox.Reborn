@@ -268,9 +268,6 @@ namespace GCNLibrary.WW
                         });
                     }
 
-                    foreach (var layout in layouts)
-                    Console.WriteLine($"FLAGS {packet.Flags2} layout {layout.Attribute}");
-
                     if (packet.Flags2 == 16 || packet.Flags2 == 17 || packet.Flags2 == 19) {
                         config.OpCodeShift = -2;
                     }

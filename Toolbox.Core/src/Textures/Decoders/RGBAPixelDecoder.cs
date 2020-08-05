@@ -109,16 +109,17 @@ namespace Toolbox.Core.Imaging
                 case TexFormat.BGRA4_UNORM:
                     {
                         comp[3] = Convert4To8((byte)((pixel >> 12) & 0xF));
-                        comp[0] = Convert4To8((byte)((pixel >> 8) & 0xF));
-                        comp[1] = Convert4To8((byte)((pixel >> 4) & 0xF));
+                        comp[1] = Convert4To8((byte)((pixel >> 8) & 0xF));
+                        comp[0] = Convert4To8((byte)((pixel >> 4) & 0xF));
                         comp[2] = Convert4To8((byte)(pixel & 0xF));
                     }
                     break;
                 case TexFormat.RG4_UNORM:
                     {
-                        comp[0] = Convert4To8((byte)((pixel >> 6) & 0xF));
-                        comp[1] = Convert4To8((byte)((pixel >> 4) & 0xF));
-                        comp[2] = Convert4To8((byte)((pixel >> 2) & 0xF));
+                        float R = ((pixel >> 0) & 0xF) / 15.0f;
+                        float G = ((pixel >> 4) & 0xF) / 15.0f;
+                        comp[0] = (byte)(R * 255);
+                        comp[1] = (byte)(G * 255);
                     }
                     break;
                 case TexFormat.RGB5A1_UNORM:

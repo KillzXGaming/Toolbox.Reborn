@@ -124,11 +124,6 @@ namespace GCNLibrary.LM.MDL
                 DrawElements = ReadList<DrawElement>(reader, FileHeader.DrawElementOffset, FileHeader.DrawElementsCount);
                 Materials = ReadList<Material>(reader, FileHeader.MaterialOffset, FileHeader.MaterialCount);
                 Nodes = ReadList<Node>(reader, FileHeader.NodeOffset, FileHeader.NodeCount);
-
-                foreach (var shape in Shapes)
-                {
-                    Console.WriteLine($"shape {shape.NormalFlags} {shape.Unknown1} {shape.Unknown2} {shape.Unknown3}");
-                }
                 Positions = new Vector3[FileHeader.VertexCount];
                 Normals = new Vector3[FileHeader.NormalCount];
                 TexCoords = new Vector2[FileHeader.TexcoordCount];

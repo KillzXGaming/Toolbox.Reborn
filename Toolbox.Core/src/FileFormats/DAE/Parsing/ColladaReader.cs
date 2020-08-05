@@ -12,11 +12,13 @@ namespace Toolbox.Core.Collada
 {
     public class ColladaReader
     {
-        public static STGenericScene Read(string fileName, DAE.ImportSettings settings = null) {
+        public static STGenericScene Read(string fileName, DAE.ImportSettings settings = null)
+        {
             return Read(COLLADA.Load(fileName), settings);
         }
 
-        public static STGenericScene Read(Stream stream, DAE.ImportSettings settings = null) {
+        public static STGenericScene Read(Stream stream, DAE.ImportSettings settings = null)
+        {
             return Read(COLLADA.Load(stream), settings);
         }
 
@@ -30,6 +32,8 @@ namespace Toolbox.Core.Collada
 
             STGenericScene Scene = new STGenericScene();
             ColladaScene colladaScene = new ColladaScene(collada, settings);
+
+            BoneNameIds.Clear();
 
             //Usually there is only one scene, but it can be possible some tools use multiple per model
             //Each one contains node hiearchies for bones and meshes
@@ -56,8 +60,12 @@ namespace Toolbox.Core.Collada
                 {
                     for (int v = 0; v < mesh.Vertices.Count; v++)
                     {
-                        foreach (var name in mesh.Vertices[v].BoneNames)
+                        for (int j = 0; j < mesh.Vertices[v].BoneNames.Count; j++)
                         {
+                            string sid = mesh.Vertices[v].BoneNames[j];
+                            string name = BoneNameIds.ContainsKey(sid) ? BoneNameIds[sid] : sid;
+                            mesh.Vertices[v].BoneNames[j] = name;
+
                             int index = model.Skeleton.Bones.FindIndex(x => x.Name == name);
                             if (index != -1)
                                 mesh.Vertices[v].BoneIndices.Add(index);
@@ -109,6 +117,8 @@ namespace Toolbox.Core.Collada
                 }
             }
 
+            BoneNameIds.Clear();
+
             sw.Stop();
             Console.WriteLine("DAE Elapsed={0}", sw.Elapsed);
 
@@ -134,13 +144,13 @@ namespace Toolbox.Core.Collada
 
             public ColladaScene(COLLADA collada, DAE.ImportSettings settings)
             {
-                Settings    = settings;
-                geometries  = FindLibraryItem<library_geometries>(collada.Items);
-                images      = FindLibraryItem<library_images>(collada.Items);
-                scenes      = FindLibraryItem<library_visual_scenes>(collada.Items);
-                effects     = FindLibraryItem<library_effects>(collada.Items);
+                Settings = settings;
+                geometries = FindLibraryItem<library_geometries>(collada.Items);
+                images = FindLibraryItem<library_images>(collada.Items);
+                scenes = FindLibraryItem<library_visual_scenes>(collada.Items);
+                effects = FindLibraryItem<library_effects>(collada.Items);
                 controllers = FindLibraryItem<library_controllers>(collada.Items);
-                materials   = FindLibraryItem<library_materials>(collada.Items);
+                materials = FindLibraryItem<library_materials>(collada.Items);
 
                 if (effects != null)
                 {
@@ -148,13 +158,15 @@ namespace Toolbox.Core.Collada
                         effectLookup.Add(effects.effect[i].id, effects.effect[i]);
                 }
 
-                if (collada.asset != null) {
+                if (collada.asset != null)
+                {
                     UpAxisType = collada.asset.up_axis;
                     UintSize = collada.asset.unit;
                 }
             }
 
-            private static T FindLibraryItem<T>(object[] items) {
+            private static T FindLibraryItem<T>(object[] items)
+            {
                 var item = Array.Find(items, x => x.GetType() == typeof(T));
                 return (T)item;
             }
@@ -167,7 +179,8 @@ namespace Toolbox.Core.Collada
             List<STGenericTexture> textures = new List<STGenericTexture>();
             foreach (var image in scene.images.image)
             {
-                if (image.Item is string) {
+                if (image.Item is string)
+                {
                     string path = (string)image.Item;
                     if (path.StartsWith("file://"))
                         path = path.Substring(7, path.Length - 7);
@@ -208,7 +221,8 @@ namespace Toolbox.Core.Collada
             STGenericMaterial mat = new STGenericMaterial();
             mat.Name = daeMat.id;
 
-            if (daeMat.instance_effect != null) {
+            if (daeMat.instance_effect != null)
+            {
                 var effectid = daeMat.instance_effect.url.Remove(0, 1);
                 if (scene.effectLookup.ContainsKey(effectid))
                 {
@@ -223,7 +237,8 @@ namespace Toolbox.Core.Collada
 
                         foreach (var param in item.Items)
                         {
-                            if (param is common_newparam_type) {
+                            if (param is common_newparam_type)
+                            {
                                 var newparam = (common_newparam_type)param;
                                 if (newparam.ItemElementName == ItemChoiceType.surface)
                                 {
@@ -236,7 +251,8 @@ namespace Toolbox.Core.Collada
                                     });
                                 }
                             }
-                            if (param is technique){
+                            if (param is technique)
+                            {
                                 var technique = (technique)param;
                             }
                         }
@@ -249,6 +265,7 @@ namespace Toolbox.Core.Collada
         }
 
         static Dictionary<int, string> NodeInstanceTransform = new Dictionary<int, string>();
+        static Dictionary<string, string> BoneNameIds = new Dictionary<string, string>();
 
         public static Node LoadScene(visual_scene visualScene,
             STGenericModel model, ColladaScene colladaScene)
@@ -260,8 +277,8 @@ namespace Toolbox.Core.Collada
                 node.Children.Add(LoadHiearchy(node, child, model, colladaScene));
 
             //Transform all meshes by node transform
-        //TODO //   foreach (var child in node.Children)
-              //  TransformMeshInstanced(model, child);
+            //TODO //   foreach (var child in node.Children)
+            //  TransformMeshInstanced(model, child);
 
             NodeInstanceTransform.Clear();
             return node;
@@ -269,7 +286,8 @@ namespace Toolbox.Core.Collada
 
         static void TransformMeshInstanced(STGenericModel model, Node parent)
         {
-            if (NodeInstanceTransform.Any(x => x.Value == $"#{parent.ID}")) {
+            if (NodeInstanceTransform.Any(x => x.Value == $"#{parent.ID}"))
+            {
                 foreach (var node in NodeInstanceTransform.Where(x => x.Value == $"#{parent.ID}"))
                 {
                     var index = node.Key;
@@ -295,12 +313,12 @@ namespace Toolbox.Core.Collada
             node.Name = daeNode.name;
             node.ID = daeNode.id;
             node.Type = daeNode.type;
-            node.Transform = DaeUtility.GetMatrix(daeNode.Items) * parent.Transform;
+            node.Transform = DaeUtility.GetLocalTransform(daeNode) * parent.Transform;
 
             if (daeNode.instance_geometry != null)
             {
                 geometry geom = DaeUtility.FindGeoemertyFromNode(daeNode, colladaScene.geometries);
-                model.Meshes.Add(LoadMeshData(colladaScene, node, geom, colladaScene.materials));
+                model.Meshes.AddRange(LoadMeshData(colladaScene, node, geom, colladaScene.materials));
             }
             if (daeNode.instance_controller != null)
             {
@@ -314,12 +332,12 @@ namespace Toolbox.Core.Collada
 
                     controller controller = DaeUtility.FindControllerFromNode(insance_controller, colladaScene.controllers);
                     geometry geom = DaeUtility.FindGeoemertyFromController(controller, colladaScene.geometries);
-                    model.Meshes.Add(LoadMeshData(colladaScene, node, geom, colladaScene.materials, controller));
+                    model.Meshes.AddRange(LoadMeshData(colladaScene, node, geom, colladaScene.materials, controller));
                 }
             }
             try
             {
-            
+
             }
             catch (Exception ex)
             {
@@ -327,18 +345,24 @@ namespace Toolbox.Core.Collada
             }
 
             //Find the root bone
-            if (node.Type == NodeType.JOINT) {
+            if (node.Type == NodeType.JOINT ||
+                daeNode.instance_geometry == null && 
+                daeNode.instance_camera == null &&
+                daeNode.instance_controller == null &&
+                daeNode.instance_light == null &&
+                daeNode.instance_node == null)
+            {
                 //Apply axis rotation
-                Matrix4 boneTransform = Matrix4.Identity;
-                if (colladaScene.UpAxisType == UpAxisType.Y_UP) {
-                  //  boneTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90));
+                Matrix4 boneTransform = parent.Transform;
+                if (colladaScene.UpAxisType == UpAxisType.Y_UP)
+                {
+                    //  boneTransform = Matrix4.CreateRotationX(MathHelper.DegreesToRadians(90));
                 }
                 if (colladaScene.UintSize != null && colladaScene.UintSize.meter != 1)
                 {
                     //var scale = ApplyUintScaling(colladaScene, new Vector3(1));
-                   // boneTransform *= Matrix4.CreateScale(scale);
+                    // boneTransform *= Matrix4.CreateScale(scale);
                 }
-
                 LoadBoneHiearchy(daeNode, model, null, ref boneTransform);
 
                 if (daeNode.node1 != null)
@@ -347,7 +371,8 @@ namespace Toolbox.Core.Collada
                         node.Children.Add(LoadBoneNodeHiearchy(node, child, ref boneTransform));
                 }
             }
-            else if (daeNode.node1 != null) {
+            else if (daeNode.node1 != null)
+            {
                 foreach (node child in daeNode.node1)
                     node.Children.Add(LoadHiearchy(node, child, model, colladaScene));
             }
@@ -384,28 +409,34 @@ namespace Toolbox.Core.Collada
             bone.Rotation = transform.ExtractRotation();
             bone.Parent = boneParent;
 
+            BoneNameIds.Add(daeNode.sid, daeNode.name);
+
             //Reset the parent transform for children. We only need to apply the parent root transform 
             parentTransform = Matrix4.Identity;
 
             if (daeNode.node1 != null)
             {
                 foreach (node child in daeNode.node1)
-                    bone.Children.Add(LoadBoneHiearchy(child, model, bone,ref parentTransform));
+                    bone.Children.Add(LoadBoneHiearchy(child, model, bone, ref parentTransform));
             }
             return bone;
         }
 
-        private static STGenericMesh LoadMeshData(ColladaScene scene, Node node,
+        private static List<STGenericMesh> LoadMeshData(ColladaScene scene, Node node,
             geometry geom, library_materials materials, controller controller = null)
         {
+            List<STGenericMesh> meshes = new List<STGenericMesh>();
+
             mesh daeMesh = geom.Item as mesh;
 
             STGenericMesh mesh = new STGenericMesh();
             mesh.Vertices = new List<STVertex>();
             mesh.Name = geom.name;
+            meshes.Add(mesh);
 
             var boneWeights = ParseWeightController(controller, scene);
-            foreach (var item in daeMesh.Items) {
+            foreach (var item in daeMesh.Items)
+            {
                 //Poly lists can control specific amounts of indices for primitive types like quads
                 if (item is polylist)
                 {
@@ -429,7 +460,6 @@ namespace Toolbox.Core.Collada
                         mesh.Vertices[v].TexCoords[i] = new Vector2(mesh.Vertices[v].TexCoords[i].X, 1 - mesh.Vertices[v].TexCoords[i].Y);
                 }
 
-
                 mesh.Vertices[v].Position = Vector3.TransformPosition(mesh.Vertices[v].Position, node.Transform);
                 mesh.Vertices[v].Normal = Vector3.TransformNormal(mesh.Vertices[v].Normal, node.Transform);
             }
@@ -438,30 +468,42 @@ namespace Toolbox.Core.Collada
             {
                 skin skin = controller.Item as skin;
                 var bindMatrix = CreateBindMatrix(skin.bind_shape_matrix);
-                for(int v = 0; v < mesh.Vertices.Count; v++)
+                Console.WriteLine($"bindMatrix {bindMatrix.ExtractScale()}");
+                bindMatrix = bindMatrix.ClearScale();
+                for (int v = 0; v < mesh.Vertices.Count; v++)
                 {
                     mesh.Vertices[v].Position = Vector3.TransformPosition(mesh.Vertices[v].Position, bindMatrix);
                     mesh.Vertices[v].Normal = Vector3.TransformNormal(mesh.Vertices[v].Normal, bindMatrix);
                 }
             }
 
-            return mesh;
+          //  meshes = STGenericMesh.SeperatePolygonGroups<STGenericMesh>(mesh);
+
+            if (scene.Settings.RemoveDuplicateVerts) {
+               // mesh.RemoveDuplicateVertices();
+            }
+
+            return meshes;
         }
 
-        private static void ConvertPolygon(ColladaScene scene,STGenericMesh mesh, mesh daeMesh,
-            InputLocalOffset[] inputs, List<BoneWeight[]> boneWeights, 
+        private static void ConvertPolygon(ColladaScene scene, STGenericMesh mesh, mesh daeMesh,
+            InputLocalOffset[] inputs, List<BoneWeight[]> boneWeights,
             library_materials materials, string material, string polys, int polyCount, string vcount = "")
         {
+            string[] indices = polys.Trim(' ').Split(' ');
+            string[] vertexCount = new string[0];
+            if (vcount != string.Empty)
+                vertexCount = vcount.Trim(' ').Split(' ');
+
+            if (indices.Length == 0 || polyCount == 0)
+                return;
+
             List<uint> faces = new List<uint>();
 
             STPolygonGroup group = new STPolygonGroup();
             mesh.PolygonGroups.Add(group);
             group.MaterialIndex = DaeUtility.FindMaterialIndex(materials, material);
 
-            string[] indices = polys.Trim(' ').Split(' ');
-            string[] vertexCount = new string[0];
-            if (vcount != string.Empty)
-                vertexCount = vcount.Trim(' ').Split(' ');
 
             int stride = 0;
             for (int i = 0; i < inputs.Length; i++)
@@ -472,12 +514,13 @@ namespace Toolbox.Core.Collada
             List<Vertex> vertices = new List<Vertex>();
             var vertexSource = DaeUtility.FindSourceFromInput(daeMesh.vertices.input[0], daeMesh.source);
             var floatArr = vertexSource.Item as float_array;
-            for (int v = 0; v < (int)floatArr.count / 3; v++) {
+            for (int v = 0; v < (int)floatArr.count / 3; v++)
+            {
                 vertices.Add(new Vertex(vertices.Count, new List<int>()));
             }
 
             var indexStride = (indices.Length / 3) / polyCount;
-            for (int i = 0; i < polyCount ; i++)
+            for (int i = 0; i < polyCount; i++)
             {
                 int count = 3;
                 if (vertexCount.Length > i)
@@ -505,12 +548,14 @@ namespace Toolbox.Core.Collada
             int numColorChannels = 0;
 
             //Find them in both types of inputs
-            for (int i = 0; i < inputs.Length; i++) {
+            for (int i = 0; i < inputs.Length; i++)
+            {
                 if (inputs[i].semantic == "TEXCOORD") numTexCoordChannels++;
                 if (inputs[i].semantic == "COLOR") numColorChannels++;
             }
 
-            for (int i = 0; i < daeMesh.vertices.input.Length; i++) {
+            for (int i = 0; i < daeMesh.vertices.input.Length; i++)
+            {
                 if (daeMesh.vertices.input[i].semantic == "TEXCOORD") numTexCoordChannels++;
                 if (daeMesh.vertices.input[i].semantic == "COLOR") numColorChannels++;
             }
@@ -547,7 +592,7 @@ namespace Toolbox.Core.Collada
                     var vertexInput = daeMesh.vertices.input[j];
                     source source = DaeUtility.FindSourceFromInput(vertexInput, daeMesh.source);
                     if (source == null) continue;
-                    if (vertexInput.semantic == "NORMAL") 
+                    if (vertexInput.semantic == "NORMAL")
                         hasNormals = true;
 
                     int dataStride = (int)source.technique_common.accessor.stride;
@@ -577,9 +622,6 @@ namespace Toolbox.Core.Collada
 
             if (!hasNormals)
                 CalculateNormals(mesh.Vertices, faces);
-            if (scene.Settings.RemoveDuplicateVerts) {
-                mesh.RemoveDuplicateVertices();
-            }
         }
 
         private static void RemoveDuplicateVerts(List<STVertex> vertices, List<uint> faces)
@@ -603,10 +645,10 @@ namespace Toolbox.Core.Collada
             int facecount = faces.Count;
             for (int i = 0; i < facecount / 4; i += 4)
             {
-                var A = faces[i+0];
-                var B = faces[i+1];
-                var C = faces[i+2];
-                var D = faces[i+3];
+                var A = faces[i + 0];
+                var B = faces[i + 1];
+                var C = faces[i + 2];
+                var D = faces[i + 3];
 
                 double dist1 = vertices[(int)A].DistanceTo(vertices[(int)C]);
                 double dist2 = vertices[(int)B].DistanceTo(vertices[(int)D]);
@@ -625,7 +667,7 @@ namespace Toolbox.Core.Collada
             return newfaces;
         }
 
-        private static void ParseVertexSource(ref STVertex vertex, ColladaScene scene, source source, 
+        private static void ParseVertexSource(ref STVertex vertex, ColladaScene scene, source source,
             int numTexCoordChannels, int numColorChannels, int stride, int index, int set, string semantic)
         {
             float_array array = source.Item as float_array;
@@ -749,7 +791,8 @@ namespace Toolbox.Core.Collada
                 int numSkinning = Convert.ToInt32(skinningCounts[v]);
 
                 BoneWeight[] boneWeightsArr = new BoneWeight[Math.Min(maxSkinning, numSkinning)];
-                for (int j = 0; j < numSkinning; j++) {
+                for (int j = 0; j < numSkinning; j++)
+                {
                     if (j < scene.Settings.MaxSkinningCount)
                     {
                         boneWeightsArr[j] = new BoneWeight();
@@ -786,17 +829,11 @@ namespace Toolbox.Core.Collada
                 return OpenTK.Matrix4.Identity;
 
             Matrix4 mat = Matrix4.CreateScale(1, 1, 1);
-        string[] data = text.Trim().Replace("\n", " ").Split(' ');
-            Console.WriteLine($"CreateBindMatrix data {data.Length}");
-            if (data.Length != 16)
-                return mat;
+            string[] strArray = text.Trim().Replace("\n", "").Split(' ');
+            strArray = strArray.Where(x => !string.IsNullOrEmpty(x)).ToArray();
 
-            mat.M11 = float.Parse(data[0]); mat.M12 = float.Parse(data[1]); mat.M13 = float.Parse(data[2]); mat.M14 = float.Parse(data[3]);
-            mat.M21 = float.Parse(data[4]); mat.M22 = float.Parse(data[5]); mat.M23 = float.Parse(data[6]); mat.M24 = float.Parse(data[7]);
-            mat.M31 = float.Parse(data[8]); mat.M32 = float.Parse(data[9]); mat.M33 = float.Parse(data[10]); mat.M34 = float.Parse(data[11]);
-            mat.M41 = float.Parse(data[12]); mat.M42 = float.Parse(data[13]); mat.M43 = float.Parse(data[14]); mat.M44 = float.Parse(data[15]);
-            mat.Transpose();
-            return mat;
+            float[] data = strArray.Select(s => Single.Parse(s)).ToArray();
+            return DaeUtility.FloatToMatrix(data);
         }
 
         private static BoneWeight[] RemoveZeroWeights(BoneWeight[] boneWeights)
@@ -843,12 +880,13 @@ namespace Toolbox.Core.Collada
             public Matrix4 Transform { get; set; }
 
             public string ID { get; set; }
-            
+
             public NodeType Type = NodeType.NODE;
 
             public List<Node> Children = new List<Node>();
 
-            public Node(Node parent) {
+            public Node(Node parent)
+            {
                 Parent = parent;
                 Transform = Matrix4.Identity;
             }

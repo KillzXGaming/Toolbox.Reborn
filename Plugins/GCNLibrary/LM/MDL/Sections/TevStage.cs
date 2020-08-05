@@ -15,7 +15,7 @@ namespace GCNLibrary.LM.MDL
 
         public TevStage()
         {
-            Unknown = ushort.MaxValue;
+            Unknown = 0;
             SamplerIndex = ushort.MaxValue;
             Unknowns2 = new float[7];
         }
@@ -25,9 +25,6 @@ namespace GCNLibrary.LM.MDL
             Unknown = reader.ReadUInt16();
             SamplerIndex = reader.ReadUInt16();
             Unknowns2 = reader.ReadSingles(7);
-
-            string joined = string.Join(",", Unknowns2);
-            Console.WriteLine($"TEV Unknown {Unknown} Unknowns2 {joined}");
         }
 
         public void Write(FileWriter writer)

@@ -28,6 +28,23 @@ namespace Toolbox.Core
             Colors = new Vector4[0]; 
         }
 
+        public STVertex(STVertex vertex)
+        {
+            Position = vertex.Position;
+            Normal = vertex.Normal;
+            TexCoords = vertex.TexCoords;
+            Colors = vertex.Colors;
+            Tangent = vertex.Tangent;
+            Bitangent = vertex.Bitangent;
+            BoneWeights = vertex.BoneWeights;
+            BoneIndices = vertex.BoneIndices;
+            BoneNames = vertex.BoneNames;
+        }
+
+        /// <summary>
+        /// Creates a struct usable for comparing vertex data.
+        /// </summary>
+        /// <returns></returns>
         public VertexStruct ToStruct()
         {
             Vector2 texCoord = Vector2.Zero;
@@ -70,7 +87,7 @@ namespace Toolbox.Core
         {
             BoneIndices.Sort();
             if (BoneWeights.Count == BoneIndices.Count)
-                BoneWeights.OrderBy(x => BoneIndices[BoneWeights.IndexOf(x)]);
+                BoneWeights = BoneWeights.OrderBy(x => BoneIndices[BoneWeights.IndexOf(x)]).ToList();
         }
     }
 

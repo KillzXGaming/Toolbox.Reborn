@@ -237,6 +237,8 @@ namespace GCNLibrary
 
             public override Stream DecompressData(Stream compressed)
             {
+                if (compressed.Length < 8) return compressed;
+
                 foreach (var compression in FileManager.GetCompressionFormats()) {
                     Console.WriteLine($"DECOMPRESS {compression}");
                     if (compression.Identify(compressed, FileName))

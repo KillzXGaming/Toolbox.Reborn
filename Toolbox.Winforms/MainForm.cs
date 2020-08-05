@@ -650,5 +650,9 @@ namespace Toolbox.Winforms
             ConsoleWindow console = new ConsoleWindow();
             console.Show(this);
         }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
+            Application.Exit();
+        }
     }
 }

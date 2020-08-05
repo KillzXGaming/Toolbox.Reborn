@@ -10,6 +10,7 @@ using Toolbox.Core.Imaging;
 using OpenTK;
 using Toolbox.Core.GX;
 using System.Threading;
+using BrawlLib.Modeling.Triangle_Converter;
 
 namespace GCNLibrary.LM.MDL
 {
@@ -57,7 +58,7 @@ namespace GCNLibrary.LM.MDL
 
             List<STGenericMaterial> materials = new List<STGenericMaterial>();
             for (int i = 0; i < Header.Materials.Length; i++)
-                materials.Add(CreateMaterial(Header.Materials[i]));
+                materials.Add(CreateMaterial(Header.Materials[i], i));
 
             model.Skeleton = new STSkeleton();
             Matrix4[] transforms = new Matrix4[Header.FileHeader.JointCount];
@@ -133,8 +134,34 @@ namespace GCNLibrary.LM.MDL
             return model;
         }
 
+        static int GetMaterialIndex(string name)
+        {
+            int index = 0;
+            string value = name.Replace("Material", string.Empty);
+            int.TryParse(value, out index);
+            return index;
+        }
+
+        static int GetTextureIndex(string name)
+        {
+            int index = 0;
+            string value = name.Replace("Texture", string.Empty);
+            int.TryParse(value, out index);
+            return index;
+        }
+
+        static int GetBoneIndex(string name)
+        {
+            int index = 0;
+            string value = name.Replace("Bone", string.Empty).Replace("Mesh", string.Empty);
+            int.TryParse(value, out index);
+            return index;
+        }
+
         public void FromGeneric(STGenericScene scene) {
             var model = scene.Models[0];
+
+            bool useTriangeStrips = false;
 
             MDL_Parser mdl = new MDL_Parser();
             mdl.FileHeader = new MDL_Parser.Header();
@@ -155,6 +182,9 @@ namespace GCNLibrary.LM.MDL
             List<DrawElement> elements = new List<DrawElement>();
             List<MDL_Parser.Weight> weights = new List<MDL_Parser.Weight>();
 
+            model.Textures = model.Textures.OrderBy(x => GetTextureIndex(x.Name)).ToList();
+            model.OrderBones(model.Skeleton.Bones.OrderBy(x => GetBoneIndex(x.Name)).ToList());
+
             foreach (var texture in model.Textures) {
                 textures.Add(new TextureHeader()
                 {
@@ -166,17 +196,23 @@ namespace GCNLibrary.LM.MDL
                 });
             }
 
-            //Create samplers to map textures to materials
-            foreach (var texture in model.Textures) {
-                samplers.Add(new Sampler()
+            //If sampler list isn't replaced in json, force a new one
+            if (Header.Samplers.Length == 0) {
+                //Create samplers to map textures to materials
+                foreach (var texture in model.Textures)
                 {
-                    WrapModeU = 2,
-                    WrapModeV = 2,
-                    MagFilter = 0,
-                    MinFilter = 0,
-                    TextureIndex = (ushort)model.Textures.IndexOf(texture),
-                });
+                    samplers.Add(new Sampler()
+                    {
+                        WrapModeU = 2,
+                        WrapModeV = 2,
+                        MagFilter = 0,
+                        MinFilter = 0,
+                        TextureIndex = (ushort)model.Textures.IndexOf(texture),
+                    });
+                }
             }
+            else
+                samplers = Header.Samplers.ToList();
 
             //Create a root node if no bones are present
             if (model.Skeleton.Bones.Count == 0) {
@@ -224,11 +260,7 @@ namespace GCNLibrary.LM.MDL
             }
 
             List<STGenericMaterial> genericMats = model.GetMaterials();
-            if (genericMats.Count == 0)
-            {
-                var mat = new Material();
-                materials.Add(mat);
-            }
+            genericMats = genericMats.OrderBy(x => GetMaterialIndex(x.Name)).ToList();
 
             //Create a new material and assign the first tev stage mapped textures
             foreach (var material in genericMats)
@@ -238,12 +270,18 @@ namespace GCNLibrary.LM.MDL
                 {
                     string name = material.TextureMaps[0].Name;
                     int index = model.Textures.FindIndex(x => x.Name == name);
-                    if (index != -1)
+                    int samplerIndex = samplers.FindIndex(x => x.TextureIndex == index);
+                    if (samplerIndex != -1)
                     {
                         mat.TevStages[0].Unknown = (ushort)0;
-                        mat.TevStages[0].SamplerIndex = (ushort)index;
+                        mat.TevStages[0].SamplerIndex = (ushort)samplerIndex;
                     }
                 }
+                materials.Add(mat);
+            }
+
+            if (genericMats.Count == 0) {
+                var mat = new Material();
                 materials.Add(mat);
             }
 
@@ -272,7 +310,8 @@ namespace GCNLibrary.LM.MDL
                 mdl.FileHeader.FaceCount += (ushort)(mesh.PolygonGroups.Sum(x => x.Faces.Count) / 3);
 
                 var group = mesh.PolygonGroups[0];
-                for (int v = 0; v < group.Faces.Count; v += 3) {
+                for (int v = 0; v < group.Faces.Count; v += 3)
+                {
                     //Check the current triangle and find the max amount of indices currently in use.
                     int maxBoneIndices = boneIndices.Count;
                     for (int i = 0; i < 3; i++)
@@ -311,7 +350,8 @@ namespace GCNLibrary.LM.MDL
                         Vector3 pos = vertex.Position;
                         Vector3 nrm = vertex.Normal;
 
-                        if (vertex.TexCoords.Length > 0) {
+                        if (vertex.TexCoords.Length > 0)
+                        {
 
                             if (!texCoords.Contains(vertex.TexCoords[0]))
                                 texCoords.Add(vertex.TexCoords[0]);
@@ -359,15 +399,17 @@ namespace GCNLibrary.LM.MDL
                                     if (jointIndex == -1)
                                         continue;
 
-                                    if (weights[w].Weights[jointIndex] == vertex.BoneWeights[j]) {
+                                    if (weights[w].Weights[jointIndex] == vertex.BoneWeights[j])
+                                    {
                                         matchedWeights++;
                                     }
                                 }
                                 if (matchedWeights == vertex.BoneIndices.Count)
                                     existingWeight = weights[w];
                             }
-                                //Find an existing weight table entry that matches
-                                if (existingWeight == null) {
+                            //Find an existing weight table entry that matches
+                            if (existingWeight == null)
+                            {
                                 existingWeight = weightEntry;
                                 weights.Add(existingWeight);
                             }
@@ -467,9 +509,57 @@ namespace GCNLibrary.LM.MDL
             Header = mdl;
         }
 
-        public string ExportMaterial(int index)
+        public string ExportSamplers()
         {
-            var material = Header.Materials[index];
+            SamplerOrder samplerList = new SamplerOrder();
+            foreach (var sampler in Header.Samplers) {
+                samplerList.Samplers.Add(new SamplerConvert()
+                {
+                    TextureIndex = sampler.TextureIndex,
+                    MagFilter = sampler.MagFilter,
+                    MinFilter = sampler.MinFilter,
+                    WrapModeU = sampler.WrapModeU,
+                    WrapModeV = sampler.WrapModeV,
+                });
+            }
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(samplerList, Newtonsoft.Json.Formatting.Indented);
+        }
+
+        public void ReplaceSamplers(string text)
+        {
+            var convertedSamplers = Newtonsoft.Json.JsonConvert.DeserializeObject
+                        <SamplerOrder>(text);
+
+            Sampler[] samplers = new Sampler[convertedSamplers.Samplers.Count];
+            for (int i = 0; i < convertedSamplers.Samplers.Count; i++)
+            {
+                samplers[i] = new Sampler()
+                {
+                    MagFilter = convertedSamplers.Samplers[i].MagFilter,
+                    MinFilter = convertedSamplers.Samplers[i].MinFilter,
+                    WrapModeU = convertedSamplers.Samplers[i].WrapModeU,
+                    WrapModeV = convertedSamplers.Samplers[i].WrapModeV,
+                    TextureIndex = convertedSamplers.Samplers[i].TextureIndex,
+                };
+            }
+            Header.Samplers = samplers.ToArray();
+        }
+
+        public string ExportMaterial(DrawElement drawElement)
+        {
+            ushort nodeIdex = 0;
+            foreach (var node in Header.Nodes)
+            {
+                for (int i = 0; i < node.ShapeCount; i++)
+                {
+                    if (node.ShapeIndex + i == drawElement.ShapeIndex)
+                        nodeIdex = node.NodeIndex;
+                }
+            }
+
+            var shape = Header.Shapes[drawElement.ShapeIndex];
+            var material = Header.Materials[drawElement.MaterialIndex];
             var convertedMat = new MaterialConvert();
             convertedMat.AlphaFlags = material.AlphaFlags;
             convertedMat.DiffuseR = material.Color.R;
@@ -478,82 +568,98 @@ namespace GCNLibrary.LM.MDL
             convertedMat.DiffuseA = material.Color.A;
             convertedMat.Unknown1 = material.Unknown1;
             convertedMat.Unknown2 = material.Unknown3;
+            convertedMat.MeshSettings = new ShapeFlags()
+            {
+                NormalsFlags = shape.NormalFlags,
+                Unknown1 = shape.Unknown1,
+                Unknown2 = shape.Unknown2,
+                Unknown3 = shape.Unknown3,
+                NodeIndex = nodeIdex,
+            };
 
             TevStageConvert[] stages = new TevStageConvert[material.NumTevStages];
             convertedMat.TevStages = stages;
             for (int i = 0; i < material.NumTevStages; i++) {
                 stages[i] = new TevStageConvert();
-                if (material.TevStages[i].SamplerIndex != ushort.MaxValue)
-                    stages[i].Sampler = Header.Samplers[material.TevStages[i].SamplerIndex];
+                stages[i].SamplerIndex = material.TevStages[i].SamplerIndex;
                 stages[i].Unknown = material.TevStages[i].Unknown;
                 stages[i].Values = material.TevStages[i].Unknowns2;
             }
             return Newtonsoft.Json.JsonConvert.SerializeObject(convertedMat, Newtonsoft.Json.Formatting.Indented);
-        }
+        }       
 
-        public void ReplaceMaterial(string text, int index)
+        public ushort ReplaceMaterial(string text, DrawElement drawElement)
         {
-            var convertedMat= Newtonsoft.Json.JsonConvert.DeserializeObject
+            var convertedMat = Newtonsoft.Json.JsonConvert.DeserializeObject
                 <MaterialConvert>(text);
 
-            var material = new Material();
-            material.Color = new STColor8(
-                convertedMat.DiffuseA, 
+            var currentMaterial = Header.Materials[drawElement.MaterialIndex];
+            currentMaterial.Color = new STColor8(
+                convertedMat.DiffuseR, 
                 convertedMat.DiffuseG, 
                 convertedMat.DiffuseB, 
-                convertedMat.DiffuseR);
-            material.AlphaFlags = convertedMat.AlphaFlags;
-            material.Unknown1 = convertedMat.Unknown1;
-            material.Unknown3 = convertedMat.Unknown2;
+                convertedMat.DiffuseA);
+            currentMaterial.AlphaFlags = convertedMat.AlphaFlags;
+            currentMaterial.Unknown1 = convertedMat.Unknown1;
+            currentMaterial.Unknown3 = convertedMat.Unknown2;
 
             List<Sampler> samplers = Header.Samplers.ToList();
 
             if (convertedMat.TevStages != null) {
-                material.NumTevStages = (byte)convertedMat.TevStages.Length;
-                for (int i = 0; i < material.NumTevStages; i++) {
+                currentMaterial.NumTevStages = (byte)convertedMat.TevStages.Length;
+                for (int i = 0; i < currentMaterial.NumTevStages; i++) {
+                    if (currentMaterial.TevStages.Length <= i)
+                        break;
+
                     var stage = convertedMat.TevStages[i];
-                    var originalStage = Header.Materials[index].TevStages[i];
+                    var currentStage  = currentMaterial.TevStages[i];
 
-                    material.TevStages[i] = new TevStage();
-                    material.TevStages[i].Unknown = stage.Unknown;
-                    material.TevStages[i].Unknowns2 = stage.Values;
-                    if (stage.Sampler != null)
-                    {
-                        for (int j = 0; j < Header.Samplers.Length; j++)
-                        {
-                            //Sorta hacky atm. Here i just find a matching sampler with the same texture
-                            if (Header.Samplers[j].TextureIndex == stage.Sampler.TextureIndex)
-                            {
-                                material.TevStages[i].SamplerIndex = (ushort)j;
-                                Header.Samplers[j].WrapModeV = stage.Sampler.WrapModeV;
-                                Header.Samplers[j].WrapModeU = stage.Sampler.WrapModeU;
-                                Header.Samplers[j].MagFilter = stage.Sampler.MagFilter;
-                                Header.Samplers[j].MinFilter = stage.Sampler.MinFilter;
-                            }
-                        } //Make a new one if the original stage has none
-                        if (originalStage.SamplerIndex == ushort.MaxValue &&
-                            stage.Sampler.TextureIndex != ushort.MaxValue)
-                        {
-                            var sampler = new Sampler();
-                            sampler.TextureIndex = stage.Sampler.TextureIndex;
-                            sampler.WrapModeU = stage.Sampler.WrapModeU;
-                            sampler.WrapModeV = stage.Sampler.WrapModeV;
-                            sampler.MagFilter = stage.Sampler.MagFilter;
-                            sampler.MinFilter = stage.Sampler.MinFilter;
-
-                            material.TevStages[i].SamplerIndex = (ushort)(Header.Samplers.Length + samplers.Count);
-                            samplers.Add(sampler);
-                        }
-                    }
+                    currentStage.Unknown = stage.Unknown;
+                    currentStage.Unknowns2 = stage.Values;
                 }
             }
 
+            var meshSettings = convertedMat.MeshSettings;
+
             Header.Samplers = samplers.ToArray();
-            Header.Materials[index] = material;
+            Header.Materials[drawElement.MaterialIndex] = currentMaterial;
+
+            Header.Shapes[drawElement.ShapeIndex].NormalFlags = meshSettings.NormalsFlags;
+            Header.Shapes[drawElement.ShapeIndex].Unknown1 = meshSettings.Unknown1;
+            Header.Shapes[drawElement.ShapeIndex].Unknown2 = meshSettings.Unknown2;
+            Header.Shapes[drawElement.ShapeIndex].Unknown3 = meshSettings.Unknown3;
+
+            return meshSettings.NodeIndex;
+        }
+
+        public class SamplerOrder
+        {
+            public List<SamplerConvert> Samplers = new List<SamplerConvert>();
+        }
+
+        public class SamplerConvert
+        {
+            public ushort TextureIndex;
+            public byte WrapModeU;
+            public byte WrapModeV;
+            public byte MinFilter;
+            public byte MagFilter;
+        }
+
+        class ShapeFlags
+        {
+            public byte NormalsFlags { get; set; }
+            public byte Unknown1 { get; set; }
+            public byte Unknown2 { get; set; }
+            public byte Unknown3 { get; set; }
+
+            public ushort NodeIndex { get; set; } = 0;
         }
 
         class MaterialConvert
         {
+            public ShapeFlags MeshSettings { get; set; }
+
             public byte DiffuseR { get; set; }
             public byte DiffuseG { get; set; }
             public byte DiffuseB { get; set; }
@@ -569,7 +675,7 @@ namespace GCNLibrary.LM.MDL
 
         class TevStageConvert
         {
-            public Sampler Sampler { get; set; }
+            public ushort SamplerIndex { get; set; }
             public ushort Unknown { get; set; }
             public float[] Values { get; set; }
         }
@@ -613,9 +719,10 @@ namespace GCNLibrary.LM.MDL
                 TraverseNodeGraph(skeleton, index + node.SiblingIndex, parentIndex);
         }
 
-        private STGenericMaterial CreateMaterial(Material material)
+        private STGenericMaterial CreateMaterial(Material material, int index)
         {
             MDL_Material mat = new MDL_Material();
+            mat.Name = $"Material{index}";
             mat.TintColor = material.Color;
 
             if (material.TevStages[0].SamplerIndex != ushort.MaxValue)

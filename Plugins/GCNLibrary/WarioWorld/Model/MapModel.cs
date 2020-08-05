@@ -87,8 +87,6 @@ namespace GCNLibrary.WW
             TextureContainer.Load(new SubStream(
                 reader.BaseStream, textureContainerOffset));
 
-            Console.WriteLine($"shapeCount {shapeCount}");
-
             Dictionary<int, MeshGroup> meshGroups = new Dictionary<int, MeshGroup>();
 
             reader.SeekBegin(shapesOffset);
@@ -122,11 +120,6 @@ namespace GCNLibrary.WW
 
                         var meshGroup = meshGroups[packet.TextureIndex];
 
-                        Console.WriteLine($"meshGroup {meshGroup == null} TextureIndex {packet.TextureIndex}");
-
-                        Console.WriteLine($"Material {packet.MaterialColorIndex} TextureIndex {packet.TextureIndex}");
-                        Console.WriteLine($"Flags1 {packet.Flags1} Flags2 {packet.Flags2}");
-
                         List<GXVertexLayout> layouts = new List<GXVertexLayout>();
                         layouts.Add(new GXVertexLayout(
                             GXAttributes.Position,
@@ -151,9 +144,6 @@ namespace GCNLibrary.WW
                                 Divisor = 1024.0f,
                             });
                         }
-
-
-                        Console.WriteLine($"layouts {layouts.Count} packet { packet.Offset} Size {packet.Size}");
 
                         var displayListData = new SubStream(reader.BaseStream, packet.Offset, packet.Size);
                         meshGroup.Vertices.AddRange(DisplayListHelper.ReadDisplayLists(

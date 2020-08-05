@@ -9,6 +9,13 @@ namespace Toolbox.Core
     /// </summary>
     public class STGenericScene
     {
+        /// <summary>
+        /// The name of the resource.
+        /// </summary>
+        public string Name { get; set; }
+
         public List<STGenericModel> Models = new List<STGenericModel>();
+
+        public List<STGenericTexture> Textures = new List<STGenericTexture>();
     }
 }
