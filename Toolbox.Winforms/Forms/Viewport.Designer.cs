@@ -33,7 +33,7 @@
             this.stPanel4 = new STLibrary.Forms.STPanel();
             this.stLabel2 = new STLibrary.Forms.STLabel();
             this.pickingModeCB = new STLibrary.Forms.STComboBox();
-            this.stCheckBox1 = new STLibrary.Forms.STCheckBox();
+            this.chkDisplayAll = new STLibrary.Forms.STCheckBox();
             this.activeModelCB = new STLibrary.Forms.STComboBox();
             this.stLabel1 = new STLibrary.Forms.STLabel();
             this.splitter1 = new System.Windows.Forms.Splitter();
@@ -42,10 +42,10 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shadingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cameraToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resetPoseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toOriginToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toModelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resetPoseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.stPanel2.SuspendLayout();
             this.stPanel4.SuspendLayout();
             this.stMenuStrip1.SuspendLayout();
@@ -53,8 +53,8 @@
             // 
             // stPanel1
             // 
-            this.stPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.stPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.stPanel1.Location = new System.Drawing.Point(3, 47);
             this.stPanel1.Name = "stPanel1";
@@ -78,7 +78,7 @@
             // 
             this.stPanel4.Controls.Add(this.stLabel2);
             this.stPanel4.Controls.Add(this.pickingModeCB);
-            this.stPanel4.Controls.Add(this.stCheckBox1);
+            this.stPanel4.Controls.Add(this.chkDisplayAll);
             this.stPanel4.Controls.Add(this.activeModelCB);
             this.stPanel4.Controls.Add(this.stLabel1);
             this.stPanel4.Dock = System.Windows.Forms.DockStyle.Top;
@@ -109,15 +109,15 @@
             this.pickingModeCB.TabIndex = 5;
             this.pickingModeCB.SelectedIndexChanged += new System.EventHandler(this.pickingModeCB_SelectedIndexChanged);
             // 
-            // stCheckBox1
+            // chkDisplayAll
             // 
-            this.stCheckBox1.AutoSize = true;
-            this.stCheckBox1.Location = new System.Drawing.Point(282, 2);
-            this.stCheckBox1.Name = "stCheckBox1";
-            this.stCheckBox1.Size = new System.Drawing.Size(74, 17);
-            this.stCheckBox1.TabIndex = 4;
-            this.stCheckBox1.Text = "Display All";
-            this.stCheckBox1.UseVisualStyleBackColor = true;
+            this.chkDisplayAll.AutoSize = true;
+            this.chkDisplayAll.Location = new System.Drawing.Point(282, 2);
+            this.chkDisplayAll.Name = "chkDisplayAll";
+            this.chkDisplayAll.Size = new System.Drawing.Size(74, 17);
+            this.chkDisplayAll.TabIndex = 4;
+            this.chkDisplayAll.Text = "Display All";
+            this.chkDisplayAll.UseVisualStyleBackColor = true;
             // 
             // activeModelCB
             // 
@@ -192,34 +192,34 @@
             this.cameraToolStripMenuItem.Size = new System.Drawing.Size(60, 20);
             this.cameraToolStripMenuItem.Text = "Camera";
             // 
-            // resetPoseToolStripMenuItem
-            // 
-            this.resetPoseToolStripMenuItem.Name = "resetPoseToolStripMenuItem";
-            this.resetPoseToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
-            this.resetPoseToolStripMenuItem.Text = "Reset Pose";
-            this.resetPoseToolStripMenuItem.Click += new System.EventHandler(this.resetPoseToolStripMenuItem_Click);
-            // 
             // resetToolStripMenuItem
             // 
             this.resetToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toOriginToolStripMenuItem,
             this.toModelToolStripMenuItem});
             this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-            this.resetToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
             this.resetToolStripMenuItem.Text = "Reset";
             // 
             // toOriginToolStripMenuItem
             // 
             this.toOriginToolStripMenuItem.Name = "toOriginToolStripMenuItem";
-            this.toOriginToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.toOriginToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
             this.toOriginToolStripMenuItem.Text = "To Origin";
             this.toOriginToolStripMenuItem.Click += new System.EventHandler(this.toOriginToolStripMenuItem_Click);
             // 
             // toModelToolStripMenuItem
             // 
             this.toModelToolStripMenuItem.Name = "toModelToolStripMenuItem";
-            this.toModelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.toModelToolStripMenuItem.Size = new System.Drawing.Size(123, 22);
             this.toModelToolStripMenuItem.Text = "To Model";
+            // 
+            // resetPoseToolStripMenuItem
+            // 
+            this.resetPoseToolStripMenuItem.Name = "resetPoseToolStripMenuItem";
+            this.resetPoseToolStripMenuItem.Size = new System.Drawing.Size(75, 20);
+            this.resetPoseToolStripMenuItem.Text = "Reset Pose";
+            this.resetPoseToolStripMenuItem.Click += new System.EventHandler(this.resetPoseToolStripMenuItem_Click);
             // 
             // Viewport
             // 
@@ -253,11 +253,11 @@
         private System.Windows.Forms.Splitter splitter1;
         private STLibrary.Forms.STPanel stPanel3;
         private STLibrary.Forms.STPanel stPanel4;
-        private STLibrary.Forms.STCheckBox stCheckBox1;
         private STLibrary.Forms.STLabel stLabel2;
         private STLibrary.Forms.STComboBox pickingModeCB;
         private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toOriginToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toModelToolStripMenuItem;
+        private STLibrary.Forms.STCheckBox chkDisplayAll;
     }
 }

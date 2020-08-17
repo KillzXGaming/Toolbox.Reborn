@@ -438,7 +438,14 @@ namespace Toolbox.Core
         }
 
         public override byte[] GetImageData(int ArrayLevel = 0, int MipLevel = 0, int DepthLevel = 0) {
-            var surfaces = DDSHelper.GetArrayFaces(this, ArrayCount, DepthLevel);
+
+            int Dx10Size = IsDX10 ? 20 : 0;
+            using (FileReader reader = new FileReader(FileInfo.FilePath)) {
+                reader.TemporarySeek((int)(MainHeader.Size + Dx10Size + 4), SeekOrigin.Begin);
+                return reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
+            }
+
+                var surfaces = DDSHelper.GetArrayFaces(this, ArrayCount, DepthLevel);
             return surfaces[ArrayLevel].mipmaps[MipLevel];
         }
 

@@ -20,6 +20,10 @@ namespace Toolbox.Core
 
             using (var reader = new FileReader(stream, true))
             {
+                if (Utils.GetExtension(fileName) == ".carc")
+                {
+                    return reader.ReadByte() == 0x10;
+                }
                 if (Utils.GetExtension(fileName) == ".lz")
                 {
                     reader.SeekBegin(12);
@@ -36,7 +40,14 @@ namespace Toolbox.Core
             using (var reader = new FileReader(stream, true))
             {
                 byte type = reader.ReadByte();
-                if (type == 0x11)
+                if (type == 0x10)
+                {
+                    uint decomp_size = reader.ReadUInt32();
+
+                    var sub = new SubStream(stream, 0);
+                    return new MemoryStream(LZ77_WII.Decompress10(sub.ToArray(), (int)decomp_size));
+                }
+                else if (type == 0x11)
                 {
                     uint decomp_size = reader.ReadUInt32();
 

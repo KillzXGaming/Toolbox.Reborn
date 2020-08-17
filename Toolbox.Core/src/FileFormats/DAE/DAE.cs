@@ -177,6 +177,13 @@ namespace Toolbox.Core.Collada
                             material.Name = name;
                         }
 
+                        if (mat.DiffuseColor != null)
+                            material.DiffuseColor = new float[4] {
+                                mat.DiffuseColor.R / 255.0F, 
+                                mat.DiffuseColor.G / 255.0F,
+                                mat.DiffuseColor.B / 255.0F,
+                                mat.DiffuseColor.A / 255.0F };
+
                         materials.Add(material);
 
                         foreach (var tex in mat.TextureMaps)

@@ -409,7 +409,8 @@ namespace Toolbox.Core.Collada
             bone.Rotation = transform.ExtractRotation();
             bone.Parent = boneParent;
 
-            BoneNameIds.Add(daeNode.sid, daeNode.name);
+            if (daeNode.sid != null)
+                BoneNameIds.Add(daeNode.sid, daeNode.name);
 
             //Reset the parent transform for children. We only need to apply the parent root transform 
             parentTransform = Matrix4.Identity;

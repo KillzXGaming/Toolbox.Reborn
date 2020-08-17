@@ -22,7 +22,8 @@ namespace Toolbox.Winforms
     {
         List<IFileFormat> fileFormats = new List<IFileFormat>();
 
-        public IFileFormat[] GetFileFormats() {
+        public IFileFormat[] GetFileFormats()
+        {
             return fileFormats.ToArray();
         }
 
@@ -100,7 +101,8 @@ namespace Toolbox.Winforms
 
         public Bitmap LoadImageResource(byte[] imageData)
         {
-            using (var ms = new System.IO.MemoryStream(imageData)) {
+            using (var ms = new System.IO.MemoryStream(imageData))
+            {
                 return new Bitmap(ms);
             }
         }
@@ -185,7 +187,8 @@ namespace Toolbox.Winforms
         }
 
 
-        private List<ObjectTreeNode> GetSelectedObjects() {
+        private List<ObjectTreeNode> GetSelectedObjects()
+        {
             return ObjectHiearchy.GetSelectedNodes();
         }
 
@@ -214,7 +217,8 @@ namespace Toolbox.Winforms
         {
             SelectedObjects = new List<object>();
             SelectedNodes = new List<ObjectTreeNode>();
-            foreach (var t in GetSelectedObjects()) {
+            foreach (var t in GetSelectedObjects())
+            {
                 SelectedObjects.Add(t.Tag);
                 SelectedNodes.Add(t);
             }
@@ -229,16 +233,18 @@ namespace Toolbox.Winforms
                 if (type.Key.IsAssignableFrom(tag.GetType()))
                 {
                     if (items.Count > 0)
-                        items.Add(new STToolStripSeparator()); 
+                        items.Add(new STToolStripSeparator());
 
                     type.Value.ActiveObject = tag;
-                    foreach (var menu in type.Value.GetContextMenuItems()) {
+                    foreach (var menu in type.Value.GetContextMenuItems())
+                    {
                         items.Add(new STToolStipMenuItem(menu.Name, null, menu.Click) { Enabled = menu.Enabled, });
                     }
                 }
             }
 
-            if (node is ArchiveHiearchy) {
+            if (node is ArchiveHiearchy)
+            {
                 items.Add(new STToolStipMenuItem("Export Raw Data", null, ArchiveExport));
             }
 
@@ -246,7 +252,8 @@ namespace Toolbox.Winforms
                 items.Add(new STToolStipMenuItem("Export Model", null, ExportModel));
             if (tag is IFileFormat)
             {
-                if (File.Exists(((IFileFormat)tag).FileInfo.FilePath)) {
+                if (File.Exists(((IFileFormat)tag).FileInfo.FilePath))
+                {
                     items.Add(new STToolStipMenuItem("Open In Explorer", null, SelectFileInExplorer, Keys.Control | Keys.Q));
                 }
             }
@@ -256,7 +263,8 @@ namespace Toolbox.Winforms
             }
 
             var menus = node.GetContextMenuItems();
-            foreach (var menu in menus) {
+            foreach (var menu in menus)
+            {
                 if (menu is ToolMenuItemSeparator)
                     items.Add(new STToolStripSeparator());
                 else
@@ -358,14 +366,16 @@ namespace Toolbox.Winforms
                 string name = System.IO.Path.GetFileName(archiveFiles[0].FileName);
                 sfd.FileName = name;
                 sfd.DefaultExt = System.IO.Path.GetExtension(name);
-                if (sfd.ShowDialog() == DialogResult.OK) {
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
                     Task.Run(() => FileWriteAsync(archiveFiles[0], sfd.FileName));
                 }
             }
             else
             {
                 FolderSelectDialog ofd = new FolderSelectDialog();
-                if (ofd.ShowDialog() == DialogResult.OK) {
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
                     ProgressWindow.Start(() => ExtractFiles(ofd.SelectedPath, archiveFiles), MainForm.Instance);
                 }
             }
@@ -373,7 +383,8 @@ namespace Toolbox.Winforms
 
         private void ExtractFiles(string folder, List<ArchiveFileInfo> archiveFiles)
         {
-            for (int i = 0; i < archiveFiles.Count; i++) {
+            for (int i = 0; i < archiveFiles.Count; i++)
+            {
                 var counter = (i * 100) / archiveFiles.Count;
                 ProgressWindow.Update($"Extracting {archiveFiles[i].FileName}", counter);
                 archiveFiles[i].FileWrite($"{folder}/{archiveFiles[i].FileName}");
@@ -383,7 +394,8 @@ namespace Toolbox.Winforms
             ProgressWindow.CloseProgressBar();
         }
 
-        public void FileWriteAsync(ArchiveFileInfo fileInfo, string filePath) {
+        public void FileWriteAsync(ArchiveFileInfo fileInfo, string filePath)
+        {
             fileInfo.DecompressData(fileInfo.FileData).SaveToFile(filePath);
         }
 
@@ -425,6 +437,8 @@ namespace Toolbox.Winforms
 
         private void SelectionChanged(ObjectTreeNode obj)
         {
+            obj.OnClick();
+
             bool tryUpdateViewport = false;
             if (Runtime.SelectedBoneIndex != -1)
             {
@@ -637,8 +651,10 @@ namespace Toolbox.Winforms
 
         private void DisposeFileFormats(IFileFormat fileFormat)
         {
-            if (fileFormat is IArchiveFile) {
-                foreach (var file in ((IArchiveFile)fileFormat).Files) {
+            if (fileFormat is IArchiveFile)
+            {
+                foreach (var file in ((IArchiveFile)fileFormat).Files)
+                {
                     if (file.FileFormat != null)
                         DisposeFileFormats(file.FileFormat);
                     file.FileData?.Dispose();
@@ -656,7 +672,8 @@ namespace Toolbox.Winforms
             var nodes = GetSelectedObjects();
             for (int i = 0; i < nodes.Count; i++)
             {
-                if (nodes[i].Tag is ArchiveFileInfo) {
+                if (nodes[i].Tag is ArchiveFileInfo)
+                {
                     var archiveInfo = (ArchiveFileInfo)nodes[i].Tag;
                     archiveInfo.FileFormat = archiveInfo.OpenFile();
 
@@ -689,19 +706,22 @@ namespace Toolbox.Winforms
             foreach (var file in fileFormats)
                 DisposeFileFormats(file);
 
-            foreach (Control control in contentPanel.Controls) {
+            foreach (Control control in contentPanel.Controls)
+            {
                 if (control is STUserControl)
                     ((STUserControl)control).OnControlClosing();
                 control.Dispose();
             }
 
-            if (Viewport != null) {
+            if (Viewport != null)
+            {
                 Viewport.OnControlClosing();
                 Viewport.Dispose();
             }
         }
 
-        private void chkUseActiveEditor_CheckedChanged(object sender, EventArgs e) {
+        private void chkUseActiveEditor_CheckedChanged(object sender, EventArgs e)
+        {
             Runtime.ObjectEditor.OpenInActiveEditor = chkUseActiveEditor.Checked;
         }
     }

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Activities.Statements;
 using System.Threading;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -225,6 +226,9 @@ namespace Toolbox.Winforms
             useComponentSelectorToolStripMenuItem.Checked = Runtime.ImageEditor.UseComponetSelector;
             enableZoomToolStripMenuItem.Checked = Runtime.ImageEditor.EnableImageZoom;
 
+            backgroundPB.BackColor = Runtime.ImageEditor.BackgroundColor;
+            backgroundPB.Visible = false;
+
             displayAlphaToolStripMenuItem.Checked = Runtime.ImageEditor.DisplayAlpha;
             SetAlphaEnableUI(Runtime.ImageEditor.DisplayAlpha);
 
@@ -290,21 +294,17 @@ namespace Toolbox.Winforms
                 case Runtime.ImageEditor.PictureBoxBG.Black:
                     pictureBoxCustom1.BackColor = Color.Black;
                     pictureBoxCustom1.BackgroundImage = null;
-                    imageBGComboBox.BackColor = FormThemes.BaseTheme.ComboBoxBackColor;
                     break;
                 case Runtime.ImageEditor.PictureBoxBG.White:
                     pictureBoxCustom1.BackColor = Color.White;
                     pictureBoxCustom1.BackgroundImage = null;
-                    imageBGComboBox.BackColor = FormThemes.BaseTheme.ComboBoxBackColor;
                     break;
                 case Runtime.ImageEditor.PictureBoxBG.Checkerboard:
                     pictureBoxCustom1.BackgroundImage = STLibraryForms.Properties.Resources.CheckerBackground;
-                    imageBGComboBox.BackColor = FormThemes.BaseTheme.ComboBoxBackColor;
                     break;
                 case Runtime.ImageEditor.PictureBoxBG.Custom:
                     pictureBoxCustom1.BackgroundImage = null;
-                    pictureBoxCustom1.BackColor = Runtime.ImageEditor.CustomPicureBoxBGColor;
-                    imageBGComboBox.BackColor = Runtime.ImageEditor.CustomPicureBoxBGColor;
+                    pictureBoxCustom1.BackColor = Runtime.ImageEditor.BackgroundColor;
                     break;
             }
         }
@@ -590,6 +590,12 @@ namespace Toolbox.Winforms
         private void imageBGComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             Runtime.ImageEditor.pictureBoxStyle = (Runtime.ImageEditor.PictureBoxBG)imageBGComboBox.SelectedItem;
+
+            if (Runtime.ImageEditor.pictureBoxStyle == Runtime.ImageEditor.PictureBoxBG.Custom)
+                backgroundPB.Visible = true;
+            else if (backgroundPB.Visible)
+                backgroundPB.Visible = false;
+
             UpdateBackgroundImage();
         }
 
@@ -627,7 +633,7 @@ namespace Toolbox.Winforms
 
         private void exportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-           // ActiveTexture.ExportImage();
+            // ActiveTexture.ExportImage();
         }
 
         private void propertyGridToolStripMenuItem_Click(object sender, EventArgs e)
@@ -748,17 +754,17 @@ namespace Toolbox.Winforms
         {
             if (ActiveTexture.ArrayCount == 0) ActiveTexture.ArrayCount = 1;
 
-          /*  ActiveTexture.EditedImages = new EditedBitmap[ActiveTexture.ArrayCount];
-            ActiveTexture.EditedImages[CurArrayDisplayLevel] = new EditedBitmap()
-            {
-                bitmap = new Bitmap(image),
-                ArrayLevel = CurArrayDisplayLevel
-            };*/
+            /*  ActiveTexture.EditedImages = new EditedBitmap[ActiveTexture.ArrayCount];
+              ActiveTexture.EditedImages[CurArrayDisplayLevel] = new EditedBitmap()
+              {
+                  bitmap = new Bitmap(image),
+                  ArrayLevel = CurArrayDisplayLevel
+              };*/
 
             pictureBoxCustom1.Image = image;
             pictureBoxCustom1.Refresh();
 
-           // UpdateTreeIcon(ActiveTexture, image);
+            // UpdateTreeIcon(ActiveTexture, image);
 
             TotalMipCount = ActiveTexture.MipCount - 1;
             TotalArrayCount = ActiveTexture.ArrayCount - 1;
@@ -785,17 +791,17 @@ namespace Toolbox.Winforms
             ActiveTexture.Width = (uint)Image.Width;
             ActiveTexture.Height = (uint)Image.Height;
 
-       /*     ActiveTexture.SetImageData(new Bitmap(Image), CurArrayDisplayLevel);
+            /*     ActiveTexture.SetImageData(new Bitmap(Image), CurArrayDisplayLevel);
 
-            CurMipDisplayLevel = 0;
-            HasBeenEdited = false;
+                 CurMipDisplayLevel = 0;
+                 HasBeenEdited = false;
 
-            if (ActiveTexture.EditedImages != null && ActiveTexture.EditedImages[CurArrayDisplayLevel] != null)
-            {
-                if (ActiveTexture.EditedImages[CurArrayDisplayLevel].bitmap != null)
-                    ActiveTexture.EditedImages[CurArrayDisplayLevel].bitmap.Dispose();
-                ActiveTexture.EditedImages[CurArrayDisplayLevel] = null;
-            }*/
+                 if (ActiveTexture.EditedImages != null && ActiveTexture.EditedImages[CurArrayDisplayLevel] != null)
+                 {
+                     if (ActiveTexture.EditedImages[CurArrayDisplayLevel].bitmap != null)
+                         ActiveTexture.EditedImages[CurArrayDisplayLevel].bitmap.Dispose();
+                     ActiveTexture.EditedImages[CurArrayDisplayLevel] = null;
+                 }*/
 
             progressBar.Value = 100;
 
@@ -1226,7 +1232,7 @@ namespace Toolbox.Winforms
 
         private void SaveSettings()
         {
-           // Config.Save();
+            // Config.Save();
         }
 
         private void pictureBoxCustom1_ZoomChanged(object sender, EventArgs e)
@@ -1304,20 +1310,6 @@ namespace Toolbox.Winforms
             viewer.Show();
         }
 
-        private void imageBGComboBox_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (Runtime.ImageEditor.pictureBoxStyle == Runtime.ImageEditor.PictureBoxBG.Custom)
-            {
-                ColorDialog dlg = new ColorDialog();
-                dlg.Color = Runtime.ImageEditor.CustomPicureBoxBGColor;
-                if (dlg.ShowDialog() == DialogResult.OK)
-                {
-                    Runtime.ImageEditor.CustomPicureBoxBGColor = dlg.Color;
-                    UpdateBackgroundImage();
-                }
-            }
-        }
-
         private void stPanel3_Paint(object sender, PaintEventArgs e)
         {
 
@@ -1328,6 +1320,33 @@ namespace Toolbox.Winforms
             Image Image = pictureBoxCustom1.Image;
             if (Image != null)
                 UpdateEditCached(BitmapExtension.AdjustGamma(Image, 2.2f));
+        }
+
+        private STColorDialog colorDlg;
+        private bool dialogActive = false;
+
+        private void backgroundPB_Click(object sender, EventArgs e)
+        {
+            if (dialogActive)
+            {
+                colorDlg.Focus();
+                return;
+            }
+
+            dialogActive = true;
+            colorDlg = new STColorDialog(((PictureBox)sender).BackColor);
+            colorDlg.AllowTransparency = false;
+            colorDlg.FormClosed += delegate
+            {
+                dialogActive = false;
+            };
+            colorDlg.ColorChanged += delegate
+            {
+                ((PictureBox)sender).BackColor = colorDlg.ColorRGB;
+                Runtime.ImageEditor.BackgroundColor = colorDlg.ColorRGB;
+                UpdateBackgroundImage();
+            };
+            colorDlg.Show();
         }
     }
 }

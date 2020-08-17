@@ -52,16 +52,19 @@ namespace Toolbox.Core.Animations
         /// </summary>
         public List<STAnimGroup> AnimGroups = new List<STAnimGroup>();
 
-        public void SetFrame(float frame) {
+        public void SetFrame(float frame)
+        {
             Frame = frame;
         }
 
-        public void UpdateFrame(int frame) {
+        public void UpdateFrame(int frame)
+        {
             SetFrame(frame);
             NextFrame();
         }
 
-        public virtual void NextFrame() {
+        public virtual void NextFrame()
+        {
             if (Frame < StartFrame || Frame > FrameCount) return;
         }
 

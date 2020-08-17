@@ -217,11 +217,14 @@ namespace Toolbox.Core.Rendering
 
         public override void ReloadUniforms(GL_ControlBase control, GL_EditorFramework.GL_Core.ShaderProgram shader)
         {
-            int i = 0;
-            foreach (var bone in Render.Model.Skeleton.Bones)
+            foreach (var model in Render.Scene.Models)
             {
-                Matrix4 transform = bone.Inverse * bone.Transform;
-                GL.UniformMatrix4(GL.GetUniformLocation(shader.programs[control], String.Format("bones[{0}]", i++)), false, ref transform);
+                int i = 0;
+                foreach (var bone in model.Skeleton.Bones)
+                {
+                    Matrix4 transform = bone.Inverse * bone.Transform;
+                    GL.UniformMatrix4(GL.GetUniformLocation(shader.programs[control], String.Format("bones[{0}]", i++)), false, ref transform);
+                }
             }
         }
 

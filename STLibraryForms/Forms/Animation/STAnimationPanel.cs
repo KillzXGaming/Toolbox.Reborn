@@ -121,6 +121,8 @@ namespace STLibrary
             animationTrackBar.StartTime = (int)StartFrame;
             animationTrackBar.ActiveAnimation = animation;
             currentFrameUpDown.Value = (decimal)StartFrame;
+            frameSpeedUD.Maximum = (decimal)animation.FrameRate * 2;
+            frameSpeedUD.Value = (decimal)animation.FrameRate;
 
             SetAnimationsToFrame(0);
             UpdateViewport();
@@ -258,7 +260,7 @@ namespace STLibrary
 
             animationTimer = new System.Timers.Timer
             {
-                Interval = (int)(1000.0f / 60.0f),
+                Interval = (int)(1000.0f / 120.0f),
             };
             animationTimer.Elapsed += animationTimer_Tick;
         }
@@ -441,7 +443,7 @@ namespace STLibrary
         {
 
             if (animationTimer != null)
-                animationTimer.Interval = (int)(1000.0f / (float)frameSpeedUD.Value);
+                animationTimer.Interval = (int)(1000.0f / ((float)frameSpeedUD.Value * 2));
         }
 
         public override void OnControlClosing()

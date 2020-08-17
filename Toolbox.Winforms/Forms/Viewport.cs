@@ -14,6 +14,7 @@ using STLibrary;
 using STLibrary.Forms;
 using Toolbox.Core;
 using GL_EditorFramework.Interfaces;
+using STLibraryForms.Properties;
 
 namespace Toolbox.Winforms
 {
@@ -25,9 +26,13 @@ namespace Toolbox.Winforms
             public List<AbstractGlDrawable> Drawables = new List<AbstractGlDrawable>();
         }
 
+        //Drawn containers to keep track of drawing skeletons and model renders together.
         public List<DrawContainer> Containers = new List<DrawContainer>();
+        //A list of model containers. Keep track of the loaded containers to dispose when closed.
+        public List<ModelContainer> ModelContainers = new List<ModelContainer>();
 
         public List<IModelFormat> Formats = new List<IModelFormat>();
+        public List<IModelSceneFormat> ResourceFormats = new List<IModelSceneFormat>();
 
         MapEditor3D Viewport3D;
         STAnimationPanel AnimationPanel;
@@ -54,19 +59,50 @@ namespace Toolbox.Winforms
             pickingModeCB.SelectedIndex = 0;
         }
 
-        public void LoadAnimationFormat(STAnimation animFormat) {
+        public void LoadAnimationFormat(STAnimation animFormat)
+        {
             AnimationPanel.AddAnimation(animFormat);
         }
 
-        public void LoadModelFormat(IModelSceneFormat modelFormat)
+        public void LoadModelFormat(IModelSceneFormat resourceFormat)
         {
+            var resource = resourceFormat.ToGeneric();
+            if (ResourceFormats.Contains(resourceFormat))
+            {
+                activeModelCB.SelectedItem = resource.Name;
+                return;
+            }
 
+            ResourceFormats.Add(resourceFormat);
+
+            var container = new ModelContainer();
+            container.AddModel(resourceFormat);
+            Runtime.ModelContainers.Add(container);
+            ModelContainers.Add(container);
+
+            var drawableContainer = new DrawContainer();
+            drawableContainer.Name = resource.Name;
+            var drawable = new GenericModelRender(resourceFormat.Renderer);
+            drawableContainer.Drawables.Add(drawable);
+            foreach (var model in resource.Models)
+            {
+                var skeleton = new GenericSkeletonRenderer(model.Skeleton);
+                drawableContainer.Drawables.Add(skeleton);
+            }
+            Containers.Add(drawableContainer);
+
+            if (Viewport3D.Scene != null)
+                ReloadScene();
+
+            activeModelCB.Items.Add(resource.Name);
+            activeModelCB.SelectedItem = resource.Name;
         }
 
         public void LoadModelFormat(IModelFormat modelFormat)
         {
-            if (Formats.Contains(modelFormat)) {
-                activeModelCB.SelectedItem = modelFormat.Renderer.Model.Name;
+            if (Formats.Contains(modelFormat))
+            {
+                activeModelCB.SelectedItem = modelFormat.Renderer.Name;
                 return;
             }
 
@@ -75,27 +111,33 @@ namespace Toolbox.Winforms
             var container = new ModelContainer();
             container.AddModel(modelFormat);
             Runtime.ModelContainers.Add(container);
+            ModelContainers.Add(container);
 
             var drawableContainer = new DrawContainer();
-            drawableContainer.Name = modelFormat.Renderer.Model.Name;
+            drawableContainer.Name = modelFormat.Renderer.Name;
             var drawable = new GenericModelRender(modelFormat.Renderer);
-            var skeleton = new GenericSkeletonRenderer(modelFormat.Renderer.Model.Skeleton);
+            foreach (var model in modelFormat.Renderer.Scene.Models)
+            {
+                var skeleton = new GenericSkeletonRenderer(model.Skeleton);
+                drawableContainer.Drawables.Add(skeleton);
+            }
             drawableContainer.Drawables.Add(drawable);
-            drawableContainer.Drawables.Add(skeleton);
             Containers.Add(drawableContainer);
 
             if (Viewport3D.Scene != null)
                 ReloadScene();
 
-            activeModelCB.Items.Add(modelFormat.Renderer.Model.Name);
-            activeModelCB.SelectedItem = modelFormat.Renderer.Model.Name;
+            activeModelCB.Items.Add(modelFormat.Renderer.Name);
+            activeModelCB.SelectedItem = modelFormat.Renderer.Name;
         }
 
-        public void DeselectAllObjects() {
+        public void DeselectAllObjects()
+        {
             Viewport3D.Scene.SelectedObjects.Clear();
         }
 
-        public void UpdateViewport() {
+        public void UpdateViewport()
+        {
             Viewport3D.UpdateViewport();
         }
 
@@ -110,11 +152,13 @@ namespace Toolbox.Winforms
             return meshes;
         }
 
-        private void ObjectSelectionChanged(object sender, EventArgs e) {
+        private void ObjectSelectionChanged(object sender, EventArgs e)
+        {
             ObjectSelected?.Invoke(sender, e);
         }
 
-        private void Viewport_Load(object sender, EventArgs e) {
+        private void Viewport_Load(object sender, EventArgs e)
+        {
             ReloadScene();
             Viewport3D.UpdateScene();
             Viewport3D.Scene.SelectionChanged += ObjectSelectionChanged;
@@ -123,7 +167,8 @@ namespace Toolbox.Winforms
 
         private void ReloadScene()
         {
-            foreach (var container in Containers) {
+            foreach (var container in Containers)
+            {
                 foreach (var drawable in container.Drawables)
                     Viewport3D.AddDrawable(drawable);
             }
@@ -131,7 +176,18 @@ namespace Toolbox.Winforms
 
         private void activeModelCB_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (chkDisplayAll.Checked)
+            {
+                for (int i = 0; i < Containers.Count; i++)
+                    ToggleModel(Containers[i], true);
+
+                ReloadPickingModes();
+                Viewport3D.UpdateViewport();
+                return;
+            }
+
             int index = activeModelCB.SelectedIndex;
+
             if (index == 0)
             {
                 for (int i = 0; i < Containers.Count; i++)
@@ -172,14 +228,17 @@ namespace Toolbox.Winforms
             return false;
         }
 
-        private bool ToggleModel(DrawContainer container, bool toggle) {
-            foreach (var drawable in container.Drawables) {
+        private bool ToggleModel(DrawContainer container, bool toggle)
+        {
+            foreach (var drawable in container.Drawables)
+            {
                 if (drawable is GenericModelRender)
                 {
                     var modelRenderer = ((GenericModelRender)drawable).Render;
                     modelRenderer.SkeletonRender.Visibile = toggle;
 
-                    if (toggle) {
+                    if (toggle)
+                    {
                         string[] values = Enum.GetNames(typeof(Runtime.DebugRender));
                         UpdateDebugModes(values.ToList());
                     }
@@ -193,13 +252,11 @@ namespace Toolbox.Winforms
             return toggle;
         }
 
-        public override void OnControlClosing() {
-            foreach (var format in Formats)
-            {
-                var container = Runtime.ModelContainers.FirstOrDefault(x => x.ModelList.Contains(format));
-                if (container != null && Runtime.ModelContainers.Contains(container))
-                    Runtime.ModelContainers.Remove(container);
-            }
+        public override void OnControlClosing()
+        {
+            foreach (var container in ModelContainers)
+                Runtime.ModelContainers.Remove(container);
+            ModelContainers.Clear();
 
             Viewport3D.OnControlClosing();
             Viewport3D.Dispose();
@@ -208,7 +265,8 @@ namespace Toolbox.Winforms
                 AnimationPanel.OnControlClosing();
         }
 
-        private void UpdateDebugModes(List<string> debugModes) {
+        private void UpdateDebugModes(List<string> debugModes)
+        {
             shadingToolStripMenuItem.DropDownItems.Clear();
             foreach (var mode in debugModes)
                 shadingToolStripMenuItem.DropDownItems.Add(
@@ -234,15 +292,18 @@ namespace Toolbox.Winforms
             Viewport3D.UpdateViewport();
         }
 
-        private void pickingModeCB_SelectedIndexChanged(object sender, EventArgs e) {
+        private void pickingModeCB_SelectedIndexChanged(object sender, EventArgs e)
+        {
             ReloadPickingModes();
             Viewport3D.UpdateViewport();
         }
 
         private void ReloadPickingModes()
         {
-            foreach (var container in Containers) {
-                foreach (var drawable in container.Drawables) {
+            foreach (var container in Containers)
+            {
+                foreach (var drawable in container.Drawables)
+                {
                     if (drawable is GenericModelRender)
                         SetModelPicker((GenericModelRender)drawable);
                 }
@@ -274,7 +335,8 @@ namespace Toolbox.Winforms
             }
         }
 
-        private void resetPoseToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void resetPoseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             if (AnimationPanel != null)
             {
                 AnimationPanel.ResetModels();
@@ -284,7 +346,8 @@ namespace Toolbox.Winforms
             UpdateViewport();
         }
 
-        private void toOriginToolStripMenuItem_Click(object sender, EventArgs e) {
+        private void toOriginToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             if (Viewport3D == null) return;
 
             Viewport3D.gl_Control.ResetCamera(false);

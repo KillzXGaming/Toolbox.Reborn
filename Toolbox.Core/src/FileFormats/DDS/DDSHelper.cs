@@ -11,8 +11,7 @@ namespace Toolbox.Core
         {
             int Dx10Size = dds.IsDX10 ? 20 : 0;
             using (FileReader reader = new FileReader(dds.FileInfo.FilePath)) {
-                reader.TemporarySeek((int)(4 + dds.MainHeader.Size + Dx10Size), SeekOrigin.Begin);
-
+                reader.TemporarySeek((int)( dds.MainHeader.Size + Dx10Size), SeekOrigin.Begin);
                 var format = dds.Platform.OutputFormat;
 
                 var Surfaces = new List<STGenericTexture.Surface>();

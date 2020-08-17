@@ -14,6 +14,37 @@ namespace Toolbox.Core
         private readonly static int F = 18;
         private static readonly int threshold = 2;
 
+        public static byte[] Decompress10(byte[] input, int decomp_size)
+        {
+            UInt32 leng = (uint)(input[1] | (input[2] << 8) | (input[3] << 16));
+            byte[] Result = new byte[leng];
+            int Offs = 4;
+            int dstoffs = 0;
+            while (true)
+            {
+                byte header = input[Offs++];
+                for (int i = 0; i < 8; i++)
+                {
+                    if ((header & 0x80) == 0) Result[dstoffs++] = input[Offs++];
+                    else
+                    {
+                        byte a = input[Offs++];
+                        byte b = input[Offs++];
+                        int offs = (((a & 0xF) << 8) | b) + 1;
+                        int length = (a >> 4) + 3;
+                        for (int j = 0; j < length; j++)
+                        {
+                            Result[dstoffs] = Result[dstoffs - offs];
+                            dstoffs++;
+                        }
+                    }
+                    if (dstoffs >= leng) return Result;
+                    header <<= 1;
+                }
+            }
+            return Result;
+        }
+
         //Ported from 
         //https://github.com/mistydemeo/quickbms/blob/5752a6a2a38e16211952553fcffa59570855ac42/included/nintendo.c#L58
         // various code from DSDecmp: http://code.google.com/p/dsdecmp/

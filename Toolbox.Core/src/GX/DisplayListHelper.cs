@@ -249,6 +249,22 @@ namespace Toolbox.Core.GX
                             vertex.Normal = new OpenTK.Vector3(X, Y, Z).Normalized();
                         }
                         break;
+                    case GXAttributes.NormalBinormalTangent:
+                        {
+                            float NormalX = ReadDataLayout(dataReader, layout);
+                            float NormalY = ReadDataLayout(dataReader, layout);
+                            float NormalZ = ReadDataLayout(dataReader, layout);
+                            float BinormalX = ReadDataLayout(dataReader, layout);
+                            float BinormalY = ReadDataLayout(dataReader, layout);
+                            float BinormalZ = ReadDataLayout(dataReader, layout);
+                            float TangentX = ReadDataLayout(dataReader, layout);
+                            float TangentY = ReadDataLayout(dataReader, layout);
+                            float TangentZ = ReadDataLayout(dataReader, layout);
+                            vertex.Normal = new OpenTK.Vector3(NormalX, NormalY, NormalZ).Normalized();
+                            vertex.Bitangent = new OpenTK.Vector4(BinormalX, BinormalY, BinormalZ, 1);
+                            vertex.Tangent = new OpenTK.Vector4(TangentX, TangentY, TangentZ, 1);
+                        }
+                        break;
                     case GXAttributes.TexCoord0:
                     case GXAttributes.TexCoord1:
                     case GXAttributes.TexCoord2:
@@ -258,7 +274,7 @@ namespace Toolbox.Core.GX
                     case GXAttributes.TexCoord6:
                     case GXAttributes.TexCoord7:
                         {
-                            int channel = (int)(layout.Attribute - GXAttributes.TexCoord0);
+                            int channel = GetChannel(layout.Attribute);
                             float X = ReadDataLayout(dataReader, layout);
                             float Y = ReadDataLayout(dataReader, layout);
                             vertex.TexCoords[channel] = new OpenTK.Vector2(X, Y);
@@ -267,7 +283,7 @@ namespace Toolbox.Core.GX
                     case GXAttributes.Color0:
                     case GXAttributes.Color1:
                         {
-                            int channel = (int)(layout.Attribute - GXAttributes.Color0);
+                            int channel = GetChannel(layout.Attribute);
                             var color = ReadDataColorLayout(dataReader, layout);
                             vertex.Colors[0] = new OpenTK.Vector4(color.X, color.Y, color.Z, color.W);
                         }
@@ -306,6 +322,8 @@ namespace Toolbox.Core.GX
                 case GXAttributes.Position:
                 case GXAttributes.Normal:
                     return 3;
+                case GXAttributes.NormalBinormalTangent:
+                    return 9;
                 case GXAttributes.TexCoord0:
                 case GXAttributes.TexCoord1:
                 case GXAttributes.TexCoord2:
@@ -334,6 +352,24 @@ namespace Toolbox.Core.GX
                     return 2;
                 case GXComponentType.F32:
                     return 4;
+            }
+            return 0;
+        }
+
+        private static int GetChannel(GXAttributes att)
+        {
+            switch (att)
+            {
+                case GXAttributes.Color0: return 0;
+                case GXAttributes.Color1: return 1;
+                case GXAttributes.TexCoord0: return 0;
+                case GXAttributes.TexCoord1: return 1;
+                case GXAttributes.TexCoord2: return 2;
+                case GXAttributes.TexCoord3: return 3;
+                case GXAttributes.TexCoord4: return 4;
+                case GXAttributes.TexCoord5: return 5;
+                case GXAttributes.TexCoord6: return 6;
+                case GXAttributes.TexCoord7: return 7;
             }
             return 0;
         }

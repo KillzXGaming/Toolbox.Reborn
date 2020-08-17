@@ -223,8 +223,7 @@ namespace Toolbox.Core.Collada
                         Writer.WriteEndElement();
                     }
 
-                    if (!HasDiffuse)
-                        WriteMaterialColor("diffuse", new float[] { 1, 1, 1, 1 });
+                    WriteMaterialColor("diffuse", materials[i].DiffuseColor);
                     if (!HasEmission)
                         WriteMaterialColor("emission", new float[] { 0, 0, 0, 1 });
                     if (!HasSpecular)
@@ -964,6 +963,8 @@ namespace Toolbox.Core.Collada
     public class Material
     {
         public string Name { get; set; }
+
+        public float[] DiffuseColor = new float[4] { 1, 1, 1, 1 };
 
         public List<TextureMap> Textures = new List<TextureMap>();
     }

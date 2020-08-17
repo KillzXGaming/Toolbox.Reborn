@@ -278,7 +278,7 @@ namespace Toolbox.Core.OpenGL
                     break;
             }
 
-          //  GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.CullFace);
 
             msh.vao.Enable();
             msh.vao.Use();
@@ -287,7 +287,7 @@ namespace Toolbox.Core.OpenGL
                 DrawElementsType.UnsignedInt,
                 group.FaceOffset);
 
-          //  GL.Enable(EnableCap.CullFace);
+            GL.Enable(EnableCap.CullFace);
         }
 
         public virtual void PrepareShaders()

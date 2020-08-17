@@ -87,15 +87,18 @@
             this.gammaFixToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.stContextMenuStrip3 = new STLibrary.Forms.STContextMenuStrip(this.components);
+            this.backgroundPB = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.stPanel1.SuspendLayout();
             this.stPanel4.SuspendLayout();
             this.stPanel5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxCustom1)).BeginInit();
             this.stContextMenuStrip2.SuspendLayout();
             this.stPanel3.SuspendLayout();
             this.stContextMenuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.backgroundPB)).BeginInit();
             this.SuspendLayout();
             // 
             // splitContainer1
@@ -130,6 +133,7 @@
             // 
             // stPanel1
             // 
+            this.stPanel1.Controls.Add(this.backgroundPB);
             this.stPanel1.Controls.Add(this.stPanel4);
             this.stPanel1.Controls.Add(this.stPanel3);
             this.stPanel1.Controls.Add(this.imageBGComboBox);
@@ -184,11 +188,15 @@
             this.pictureBoxCustom1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBoxCustom1.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBoxCustom1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("pictureBoxCustom1.BackgroundImage")));
             this.pictureBoxCustom1.ContextMenuStrip = this.stContextMenuStrip2;
             this.pictureBoxCustom1.Location = new System.Drawing.Point(0, 0);
             this.pictureBoxCustom1.Name = "pictureBoxCustom1";
             this.pictureBoxCustom1.Size = new System.Drawing.Size(383, 382);
+            this.pictureBoxCustom1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxCustom1.TabIndex = 0;
+            this.pictureBoxCustom1.TabStop = false;
             // 
             // stContextMenuStrip2
             // 
@@ -224,7 +232,6 @@
             // alphaBtn
             // 
             this.alphaBtn.BackColor = System.Drawing.Color.Transparent;
-            this.alphaBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("alphaBtn.BackgroundImage")));
             this.alphaBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.alphaBtn.FlatAppearance.BorderSize = 0;
             this.alphaBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -239,7 +246,6 @@
             // editBtn
             // 
             this.editBtn.BackColor = System.Drawing.Color.Transparent;
-            this.editBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("editBtn.BackgroundImage")));
             this.editBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.editBtn.Enabled = false;
             this.editBtn.FlatAppearance.BorderSize = 0;
@@ -255,7 +261,6 @@
             // saveBtn
             // 
             this.saveBtn.BackColor = System.Drawing.Color.Transparent;
-            this.saveBtn.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("saveBtn.BackgroundImage")));
             this.saveBtn.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.saveBtn.FlatAppearance.BorderSize = 0;
             this.saveBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -343,7 +348,6 @@
             this.imageBGComboBox.Size = new System.Drawing.Size(95, 21);
             this.imageBGComboBox.TabIndex = 2;
             this.imageBGComboBox.SelectedIndexChanged += new System.EventHandler(this.imageBGComboBox_SelectedIndexChanged);
-            this.imageBGComboBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.imageBGComboBox_MouseClick);
             // 
             // stContextMenuStrip1
             // 
@@ -371,7 +375,7 @@
             // exportToolStripMenuItem
             // 
             this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            this.exportToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
             this.exportToolStripMenuItem.Text = "Export";
             this.exportToolStripMenuItem.Click += new System.EventHandler(this.exportToolStripMenuItem_Click);
             // 
@@ -620,7 +624,7 @@
             // gammaFixToolStripMenuItem
             // 
             this.gammaFixToolStripMenuItem.Name = "gammaFixToolStripMenuItem";
-            this.gammaFixToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gammaFixToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.gammaFixToolStripMenuItem.Text = "Gamma Correct";
             this.gammaFixToolStripMenuItem.Click += new System.EventHandler(this.gammaFixToolStripMenuItem_Click);
             // 
@@ -628,6 +632,15 @@
             // 
             this.stContextMenuStrip3.Name = "stContextMenuStrip3";
             this.stContextMenuStrip3.Size = new System.Drawing.Size(61, 4);
+            // 
+            // backgroundPB
+            // 
+            this.backgroundPB.Location = new System.Drawing.Point(363, 0);
+            this.backgroundPB.Name = "backgroundPB";
+            this.backgroundPB.Size = new System.Drawing.Size(23, 24);
+            this.backgroundPB.TabIndex = 19;
+            this.backgroundPB.TabStop = false;
+            this.backgroundPB.Click += new System.EventHandler(this.backgroundPB_Click);
             // 
             // ImageEditorBase
             // 
@@ -645,11 +658,13 @@
             this.stPanel4.PerformLayout();
             this.stPanel5.ResumeLayout(false);
             this.stPanel5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxCustom1)).EndInit();
             this.stContextMenuStrip2.ResumeLayout(false);
             this.stPanel3.ResumeLayout(false);
             this.stPanel3.PerformLayout();
             this.stContextMenuStrip1.ResumeLayout(false);
             this.stContextMenuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.backgroundPB)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -712,5 +727,6 @@
         private System.Windows.Forms.ToolStripMenuItem previewGammaFixSmashUltimateToolStripMenuItem;
         private STLibrary.Forms.STLabel noteifcationLbl;
         private System.Windows.Forms.ToolStripMenuItem gammaFixToolStripMenuItem;
+        private System.Windows.Forms.PictureBox backgroundPB;
     }
 }

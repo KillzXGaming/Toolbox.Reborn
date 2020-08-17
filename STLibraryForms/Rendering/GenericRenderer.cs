@@ -240,8 +240,8 @@ namespace Toolbox.Core.Rendering
             {
                 if (pass == Pass.TRANSPARENT)
                 {
-                 //   GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-                //    GL.Enable(EnableCap.Blend);
+                    GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+                    GL.Enable(EnableCap.Blend);
                 }
 
                 control.CurrentShader = shaderProgram;

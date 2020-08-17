@@ -56,9 +56,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Toolbox.Core">
-      <HintPath>..\External\Toolbox.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Forms\Dialog\ColorSelector.cs">
@@ -403,6 +400,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Forms\OpenGL2D\Camera\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Toolbox.Core\Toolbox.Core.csproj">
+      <Project>{9d9eb823-e0f4-4149-8c36-a3e7c844bb24}</Project>
+      <Name>Toolbox.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
