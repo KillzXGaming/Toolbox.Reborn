@@ -85,7 +85,8 @@ namespace GCNLibrary.Pikmin1.Model
             TextureFlags = reader.ReadByte();
             ushort tevflags = reader.ReadByte();
             short textureIndex = reader.ReadInt16();
-            TextureAttributeIndices[0] = reader.ReadInt16();
+            reader.ReadByte();
+            TextureAttributeIndices[0] = reader.ReadSByte();
             DiffuseColor = reader.ReadColor8RGBA();
 
             if (tevflags != 0) {

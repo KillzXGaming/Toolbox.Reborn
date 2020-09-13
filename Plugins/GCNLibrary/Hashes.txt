@@ -1,3 +1,10 @@
+# KCL Flags
+camera_id
+Sound_code
+Floor_code
+Wall_code
+Camera_through
+
 # orientation
 pos_x
 pos_y

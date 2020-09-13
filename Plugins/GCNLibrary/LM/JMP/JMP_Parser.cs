@@ -8,6 +8,8 @@ namespace GCNLibrary.LM
 {
     public class JMP_Parser
     {
+        public bool IsBigEndian = false;
+
         public List<Field> Fields = new List<Field>();
         public List<Record> Records = new List<Record>();
 
@@ -23,7 +25,13 @@ namespace GCNLibrary.LM
 
         private void Read(FileReader reader)
         {
-            reader.SetByteOrder(true);
+            using (reader.TemporarySeek(8, SeekOrigin.Begin))
+            {
+                if (reader.ReadUInt32() != 76)
+                    IsBigEndian = true;
+            }
+
+            reader.SetByteOrder(IsBigEndian);
             uint recordCount = reader.ReadUInt32();
             uint fieldCount = reader.ReadUInt32();
             uint recordOffset = reader.ReadUInt32();
@@ -41,7 +49,29 @@ namespace GCNLibrary.LM
 
         private void Write(FileWriter writer)
         {
-            writer.SetByteOrder(true);
+            writer.SetByteOrder(IsBigEndian);
+            writer.Write(Records.Count);
+            writer.Write(Fields.Count);
+            writer.Write(16 + (Fields.Count * 12));
+            writer.Write(MaxFieldSize());
+
+            for (int i = 0; i < Fields.Count; i++)
+                Fields[i].Write(writer);
+            for (int i = 0; i < Records.Count; i++)
+                Records[i].Write(writer, Fields);
+        }
+
+        private uint MaxFieldSize()
+        {
+            uint size = uint.MinValue;
+            for (int i = 0; i < Fields.Count; i++)
+                size = Math.Min(size, Fields[i].GetDataSize());
+
+            return AlignedSize(size, 4);
+        }
+
+        private uint AlignedSize(uint size, uint amount) {
+            return ((size + amount - 1) % amount) *amount;
         }
 
         public class Field
@@ -85,6 +115,29 @@ namespace GCNLibrary.LM
                 Type = (FieldType)reader.ReadByte();
                 Name = JMPHashHelper.GetHashName(Hash);
             }
+
+            public void Write(FileWriter writer)
+            {
+                writer.Write(Hash);
+                writer.Write(Bitmask);
+                writer.Write(Offset);
+                writer.Write(Shift);
+                writer.Write((byte)Type);
+            }
+
+            public uint GetDataSize()
+            {
+                switch (Type)
+                {
+                    case FieldType.Byte:   return 1;
+                    case FieldType.Int16:  return 2;
+                    case FieldType.Float:  return 4;
+                    case FieldType.Int32:  return 4;
+                    case FieldType.String: return 4;
+                    default:
+                      return 4;
+                }
+            }
         }
 
         public class Record
@@ -118,6 +171,36 @@ namespace GCNLibrary.LM
                             break;
                         case FieldType.StringJIS:
                             Values[i] = reader.ReadZeroTerminatedString(Encoding.GetEncoding("shift_jis"));
+                            break;
+                    }
+                }
+            }
+
+           public void Write(FileWriter writer, List<Field> fields)
+            {
+                long pos = writer.Position;
+                for (int i = 0; i < fields.Count; i++)
+                {
+                    writer.SeekBegin(pos + fields[i].Offset);
+                    switch (fields[i].Type)
+                    {
+                        case FieldType.Int32:
+                            writer.Write((uint)Values[i] << fields[i].Shift | fields[i].Bitmask);
+                            break;
+                        case FieldType.Float:
+                            writer.Write((float)Values[i]);
+                            break;
+                        case FieldType.String:
+                            writer.WriteString((string)Values[i]);
+                            break;
+                        case FieldType.Int16:
+                            writer.Write((short)Values[i]);
+                            break;
+                        case FieldType.Byte:
+                            writer.Write((byte)Values[i]);
+                            break;
+                        case FieldType.StringJIS:
+                            writer.WriteString((string)Values[i], Encoding.GetEncoding("shift_jis"));
                             break;
                     }
                 }

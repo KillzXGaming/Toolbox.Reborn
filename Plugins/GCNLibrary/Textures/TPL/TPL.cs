@@ -29,7 +29,7 @@ namespace GCNLibrary
         public List<STGenericTexture> Textures = new List<STGenericTexture>();
         public IEnumerable<STGenericTexture> TextureList => Textures;
 
-        private TPL_Parser Header;
+        public TPL_Parser Header;
 
         public void Load(Stream stream) {
             Header = new TPL_Parser(stream);

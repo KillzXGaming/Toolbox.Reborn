@@ -61,7 +61,14 @@ namespace GCNLibrary.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to # orientation
+        ///   Looks up a localized string similar to # KCL Flags
+        ///camera_id
+        ///Sound_code
+        ///Floor_code
+        ///Wall_code
+        ///Camera_through
+        ///
+        ///# orientation
         ///pos_x
         ///pos_y
         ///pos_z
@@ -116,14 +123,7 @@ namespace GCNLibrary.Properties {
         ///OpenDoorNo
         ///appear_percent
         ///type
-        ///invisible
-        ///attack_type
-        ///room
-        ///other
-        ///cond_type
-        ///do_type
-        ///cond_string_arg0
-        ///appear_time [rest of string was truncated]&quot;;.
+        ///invisible [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Hashes {
             get {

@@ -172,7 +172,7 @@ namespace CTRLibrary
             foreach (FileEntry entry in Files)
                 entry.SaveFileFormat();
 
-            writer.Align(32);
+             writer.Align(32);
 
             Console.WriteLine("Directories");
 

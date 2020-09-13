@@ -67,6 +67,7 @@ namespace GCNLibrary.Pikmin1.Model
                     break;
                 case ChunkOperation.VertexPosition: buffer.PositionsOffset = GetVertexOffset(reader); break;
                 case ChunkOperation.VertexNormal: buffer.NormalsOffset = GetVertexOffset(reader); break;
+                case ChunkOperation.VertexNBT: buffer.NBTOffset = GetVertexOffset(reader); break;
                 case ChunkOperation.VertexUV0:
                 case ChunkOperation.VertexUV1:
                 case ChunkOperation.VertexUV2:
@@ -177,10 +178,13 @@ namespace GCNLibrary.Pikmin1.Model
                 Console.WriteLine($"matrixIndices {matrixIndices[i]}");
             }
 
+            var NBT = (vtxDescriptor >> 4);
+            bool hasNBT = NBT > 0;
+
             uint numDisplayLists = reader.ReadUInt32();
             for (int dlIdx = 0; dlIdx < numDisplayLists; dlIdx++)
             {
-                int flags = reader.ReadInt32();
+                byte[] flags = reader.ReadBytes(4);
                 int unk1 = reader.ReadInt32();
                 int dataSize = reader.ReadInt32();
                 reader.AlignPadding(0x20);
@@ -196,7 +200,10 @@ namespace GCNLibrary.Pikmin1.Model
                     layouts.Add(new GXVertexLayout(GXAttributes.Tex0Matrix, GXComponentType.S8, GXAttributeType.INDEX8, 0));
 
                 layouts.Add(new GXVertexLayout(GXAttributes.Position, GXComponentType.F32, GXAttributeType.INDEX16, buffer.PositionsOffset));
-                if (buffer.NormalsOffset != 0)
+
+                if (hasNBT && false)
+                    layouts.Add(new GXVertexLayout(GXAttributes.NormalBinormalTangent, GXComponentType.F32, GXAttributeType.INDEX16, buffer.NBTOffset));
+                else if (buffer.NormalsOffset != 0)
                     layouts.Add(new GXVertexLayout(GXAttributes.Normal, GXComponentType.F32, GXAttributeType.INDEX16, buffer.NormalsOffset));
 
                 if ((vtxDescriptor & 4) == 4)
@@ -218,33 +225,32 @@ namespace GCNLibrary.Pikmin1.Model
                 for (int l = 0; l < layouts.Count; l++)
                     Console.WriteLine($"layouts {layouts[l].Attribute} {layouts[l].AttType}");
 
-                mesh.Vertices.AddRange(DisplayListHelper.ReadDisplayLists(dlData, reader.BaseStream, layouts.ToArray(), null, matrixIndices));
-
-                List<STVertex> vertices = new List<STVertex>();
-                for (int v = 0; v < mesh.Vertices.Count; v++)
+                List<STVertex> vertices = DisplayListHelper.ReadDisplayLists(dlData, reader.BaseStream, layouts.ToArray(), null, matrixIndices);
+                List<STVertex> dupeVertices = new List<STVertex>();
+                for (int v = 0; v < vertices.Count; v++)
                 {
-                    if (mesh.Vertices[v].BoneIndices.Count > 0 && !vertices.Contains(mesh.Vertices[v]))
+                    if (vertices[v].BoneIndices.Count > 0 && !dupeVertices.Contains(vertices[v]))
                     {
-                        vertices.Add(mesh.Vertices[v]);
-                        var boneIndex = mesh.Vertices[v].BoneIndices[0];
+                        dupeVertices.Add(vertices[v]);
+                        var boneIndex = vertices[v].BoneIndices[0];
                         if (boneIndex >= RigidSkinningIndices.Length)
                         {
                             boneIndex = SmoothSkinningIndices[boneIndex - RigidSkinningIndices.Length];
-                            mesh.Vertices[v].BoneIndices.Clear();
-                            mesh.Vertices[v].BoneWeights.Clear();
+                            vertices[v].BoneIndices.Clear();
+                            vertices[v].BoneWeights.Clear();
 
                             var envelop = Envelopes[boneIndex];
                             for (int j = 0; j < envelop.Indices.Length; j++)
                             {
-                                mesh.Vertices[v].BoneIndices.Add(envelop.Indices[j]);
-                                mesh.Vertices[v].BoneWeights.Add(envelop.Weights[j]);
+                                vertices[v].BoneIndices.Add(envelop.Indices[j]);
+                                vertices[v].BoneWeights.Add(envelop.Weights[j]);
 
                                 Console.WriteLine($"env {envelop.Indices[j]} w {envelop.Weights[j]}");
                             }
                         }
                     }
                 }
-                vertices.Clear();
+                mesh.Vertices.AddRange(vertices);
             }
         }
 
@@ -259,6 +265,7 @@ namespace GCNLibrary.Pikmin1.Model
         {
             public uint PositionsOffset { get; set; }
             public uint NormalsOffset { get; set; }
+            public uint NBTOffset { get; set; }
             public List<uint> TexCoordsOffset = new List<uint>();
             public uint ColorsOffset { get; set; }
         }

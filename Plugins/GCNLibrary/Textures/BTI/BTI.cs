@@ -6,7 +6,7 @@ using Toolbox.Core.IO;
 using Toolbox.Core.Imaging;
 using System.Runtime.InteropServices;
 
-namespace Factor5Library
+namespace GCNLibrary
 {
     public class BTI : STGenericTexture, IFileFormat
     {
@@ -45,8 +45,8 @@ namespace Factor5Library
             public uint ImageOffset;
         }
 
-        private Header ImageHeader;
-        private byte[] ImageData;
+        public Header ImageHeader;
+        public byte[] ImageData;
 
         public void Load(Stream stream)
         {

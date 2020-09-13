@@ -42,16 +42,23 @@ namespace GCNLibrary.LM
                 }
 
                 uint hash = Calculate(lines[i]);
-
                 if (!hashes.ContainsKey(hash))
                     hashes.Add(hash, lines[i]);
-        }
+
+                hash = CalculateV2(lines[i]);
+                if (!hashes.ContainsKey(hash))
+                    hashes.Add(hash, lines[i]);
+            }
 
             return hashes;
         }
 
         private static uint Calculate(string str) {
             return Calculate(Encoding.ASCII.GetBytes(str));
+        }
+
+        private static uint CalculateV2(string str) {
+            return CalculateV2(Encoding.ASCII.GetBytes(str));
         }
 
         private static uint Calculate(byte[] data)
@@ -64,6 +71,15 @@ namespace GCNLibrary.LM
                 var r6 = unchecked((uint)((4993ul * hash) >> 32));
                 var r0 = unchecked((byte)((((hash - r6) / 2) + r6) >> 24));
                 hash -= r0 * 33554393u;
+            }
+            return hash;
+        }
+
+        private static uint CalculateV2(byte[] data)
+        {
+            uint hash = 0;
+            for (var i = 0; i < data.Length; ++i) {
+                hash = (hash * 31 + data[i]) & 0xFFFFFFFF;
             }
             return hash;
         }

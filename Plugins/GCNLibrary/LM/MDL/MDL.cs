@@ -339,6 +339,8 @@ namespace GCNLibrary.LM.MDL
                     drawList.OpCode = (byte)GXOpCodes.DRAW_TRIANGLES;
                     packet.DrawLists.Add(drawList);
 
+
+
                     for (int i = 0; i < 3; i++)
                     {
                         ShapePacket.VertexGroup vertexGroup = new ShapePacket.VertexGroup();

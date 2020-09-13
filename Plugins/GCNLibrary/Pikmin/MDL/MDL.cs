@@ -25,7 +25,9 @@ namespace GCNLibrary.Pikmin1.Model
             return fileInfo.Extension == ".mod";
         }
 
-        public ModelRenderer Renderer => new ModelRenderer(ToGeneric());
+        public ModelRenderer Renderer => new ModelRenderer(ToGeneric())
+        { };
+
         public MOD_Parser Header;
 
         public void Load(Stream stream)

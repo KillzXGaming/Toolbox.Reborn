@@ -17,7 +17,7 @@ namespace GCNLibrary.LM
         public File_Info FileInfo { get; set; }
 
         public bool Identify(File_Info fileInfo, Stream stream) {
-            return fileInfo.FilePath.Contains("jmp") || fileInfo.FilePath.Contains("path");
+            return fileInfo.FilePath.Contains("jmp") || fileInfo.FilePath.Contains("path") || fileInfo.FilePath.Contains(".pa");
         }
 
         public TextFileType TextFileType => TextFileType.Yaml;

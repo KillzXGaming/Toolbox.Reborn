@@ -13,7 +13,7 @@ namespace GCNLibrary.WW
     {
         public string FileName { get; set; }
 
-        public ModelRenderer Renderer => new ModelRenderer(ToGeneric());
+        public ModelRenderer Renderer => new ModelRenderer(ToGeneric()) { DisplayVertexColorAlpha = false };
         public TPL TextureContainer { get; set; }
         public List<Mesh> Meshes = new List<Mesh>();
 
@@ -41,7 +41,7 @@ namespace GCNLibrary.WW
 
                     var mat = new STGenericMaterial();
                     group.Material = mat;
-                    group.IsTransparentPass = true;
+               //     group.IsTransparentPass = true;
                     if (TextureContainer.Textures.Count > 0)
                     {
                         var texMap = new STGenericTextureMap()
