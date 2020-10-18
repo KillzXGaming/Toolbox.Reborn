@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>C:\Users\Nathan\source\repos\ToolboxReborn\Toolbox.Winforms\bin\Debug\Plugins\</OutputPath>
+    <OutputPath>..\..\Toolbox.Reborn\Toolbox.Winforms\bin\Debug\Plugins\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
