@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GCNLibrary", "Plugins\GCNLi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Toolbox.Core", "Toolbox.Core\Toolbox.Core.csproj", "{9D9EB823-E0F4-4149-8C36-A3E7C844BB24}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CTRLibrary", "Plugins\CTRLibrary\CTRLibrary.csproj", "{B743BB73-D851-403F-A60A-4536AB56A4E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,12 +37,17 @@ Global
 		{9D9EB823-E0F4-4149-8C36-A3E7C844BB24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D9EB823-E0F4-4149-8C36-A3E7C844BB24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D9EB823-E0F4-4149-8C36-A3E7C844BB24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B743BB73-D851-403F-A60A-4536AB56A4E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B743BB73-D851-403F-A60A-4536AB56A4E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B743BB73-D851-403F-A60A-4536AB56A4E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B743BB73-D851-403F-A60A-4536AB56A4E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6D270285-B5E6-48D3-BCE2-9E13AFEFC092} = {E978A491-426D-430B-9D6B-663DD7324602}
+		{B743BB73-D851-403F-A60A-4536AB56A4E4} = {E978A491-426D-430B-9D6B-663DD7324602}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {878A46C4-77E6-4F6F-8D1A-79BA850F89D1}

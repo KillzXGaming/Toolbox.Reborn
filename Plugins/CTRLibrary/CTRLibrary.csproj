@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;net46</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>C:\Users\Nathan\source\repos\ToolboxReborn\Toolbox.Winforms\bin\Debug\Plugins\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Roms\3DS\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Toolbox.Core\Toolbox.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="OpenTK">
+      <HintPath>..\..\Toolbox.Core\External\Framework\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="Syroot.BinaryData">
+      <HintPath>..\..\Toolbox.Core\External\Framework\Syroot.BinaryData.dll</HintPath>
+    </Reference>
+    <Reference Include="Syroot.Maths">
+      <HintPath>..\..\Toolbox.Core\External\Framework\Syroot.Maths.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
